@@ -2,6 +2,8 @@
 
 Measured on 2026-11-06 and 2026-11-07 in Claude Code. Raw output is in `workspace/review-receipts/`, which is git-ignored. [docs/BENCHMARKING.md](../../docs/BENCHMARKING.md) explains the method and how to repeat it.
 
+**Read this with the [fresh test](FRESH-TEST-RESULTS.md),** run later on 35 PRs from other projects. It found much higher false-alarm rates than the tables below, and is likely closer to what you'll see on your own code.
+
 **What was measured:** pre-release builds named `evidence-review`. After the last real-PR and fixture runs, unused instructions for verifier subagents were removed, the skill was renamed `review-receipts`, and its description was reworded. None of this touched the rest of the instructions. The real-PR scores weren't rerun. The fixtures were rerun after the removal, and the trigger test after the rename and the new description.
 
 ## Real pull requests

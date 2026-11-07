@@ -38,6 +38,19 @@ node evals/review-receipts/run.mjs report --suite holdout --iteration final
 
 `--suite dev` is the 15 PRs for developing the skill. `--suite holdout` is the other 35. Tuning against the holdout makes its scores meaningless. Results for version 1.0.0 are in `RESULTS.md`.
 
+## Fresh PRs
+
+For a claim about improvement, use PRs nobody has studied. Write the plan and success rules first, as in [FRESH-TEST-PLAN.md](FRESH-TEST-PLAN.md), and change the seed so a new sample gets drawn.
+
+```sh
+node evals/review-receipts/prepare-fresh-prs.mjs search         # GitHub only, about 25 minutes
+node evals/review-receipts/prepare-fresh-prs.mjs select
+node evals/review-receipts/prepare-fresh-prs.mjs build          # about 14 GB
+node evals/review-receipts/prepare-fresh-prs.mjs key            # answer key, using model usage
+node evals/review-receipts/prepare-fresh-prs.mjs import-bots
+node evals/review-receipts/run.mjs run --suite fresh --iteration fresh --configs prev_skill,with_skill
+```
+
 ## Analyses
 
 ```sh

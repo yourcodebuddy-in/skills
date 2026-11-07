@@ -21,6 +21,8 @@ Tested on 35 real pull requests from Sentry, Grafana, Cal.com, Discourse and Key
 
 Of the 8 published tools we scored with the same judge, the top one scored 61.9, so this isn't the leader on overall score. [Full results, limits and method](evals/review-receipts/RESULTS.md).
 
+**A later test found more false alarms.** On 35 newer PRs from 35 other projects, with one run per PR, the current version still scored higher than no skill (F1 26.7 vs. 23.5 on Sonnet, 21.3 vs. 12.0 on Haiku). But Claude Opus judged 18% of its Sonnet findings and 15% of its Haiku findings to be false alarms, well above the 6% measured on Sonnet in the table's test. Expect the higher figure on your own code. [Fresh test results](evals/review-receipts/FRESH-TEST-RESULTS.md).
+
 ## Install
 
 Install one skill:

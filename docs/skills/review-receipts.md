@@ -65,6 +65,8 @@ F1 counts anything missing from the benchmark's list of known issues as wrong, b
 
 Only Qodo Extended got this deeper check among the published tools, and Qodo's findings were more often real (86% vs. 80%). On 32 small test changes across many project types, Sonnet with the skill found all 33 planted problems, with no false alarms, invented claims, or inflated severity, in one run each. Those test changes were also used during development, so treat that as a check, not a score.
 
+**A later test found more false alarms.** On 35 newer PRs from 35 other projects, Claude Opus judged 18% of the Sonnet findings and 15% of the Haiku findings to be false alarms, against the 6% above. Only 65% of Sonnet's findings and 37% of Haiku's were real issues. Expect these higher figures on your own code. See [the fresh test results](../../evals/review-receipts/FRESH-TEST-RESULTS.md).
+
 ## Choosing a model
 
 The main agent's model sets the tradeoff. Either way, the hunting passes run on the cheapest model available.

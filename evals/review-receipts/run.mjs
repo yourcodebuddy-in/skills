@@ -22,6 +22,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../..");
 const WORKSPACE = join(ROOT, "workspace/review-receipts");
 const REAL_SUITE = join(WORKSPACE, "cache/real-prs.json");
+const FRESH_SUITE = join(WORKSPACE, "cache/fresh-prs.json");
 const PUBLISHED_REVIEWS = join(WORKSPACE, "cache/martian/results/benchmark_data.json");
 const SNAPSHOTS = join(WORKSPACE, "cache/snapshots");
 
@@ -857,14 +858,16 @@ async function triggers(opts) {
 
 const [command, ...rest] = process.argv.slice(2);
 const options = parseArgs(rest);
-// Suites: fixtures by default, or real PRs with --suite dev (15 PRs), holdout (the other 35), or all.
-if (options.suite && !existsSync(REAL_SUITE)) {
+// Suites: fixtures by default, or real PRs with --suite dev (15 PRs), holdout (the other 35), all, or fresh.
+if (options.suite && !existsSync(options.suite === "fresh" ? FRESH_SUITE : REAL_SUITE)) {
   console.error("The real-PR data isn't downloaded yet. Run: node evals/review-receipts/prepare-real-prs.mjs download");
   process.exit(2);
 }
 const EVALS = !options.suite
   ? JSON.parse(readFileSync(join(HERE, "evals.json"), "utf8")).evals
-  : JSON.parse(readFileSync(REAL_SUITE, "utf8")).filter((p) => options.suite === "all" || p.dev === (options.suite === "dev"));
+  : options.suite === "fresh"
+    ? JSON.parse(readFileSync(FRESH_SUITE, "utf8"))
+    : JSON.parse(readFileSync(REAL_SUITE, "utf8")).filter((p) => options.suite === "all" || p.dev === (options.suite === "dev"));
 const iterationDir = options.iteration ? join(WORKSPACE, `iteration-${options.iteration}`) : null;
 const pick = options.cases ? EVALS.filter((e) => options.cases.split(",").includes(e.id)) : EVALS;
 

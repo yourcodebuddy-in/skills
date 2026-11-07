@@ -92,7 +92,7 @@ node evals/review-receipts/run.mjs compliance --suite holdout --iteration final 
 
 Then run the fixtures and `trigger` on each model, and update `RESULTS.md` and the skill's page in `docs/skills/`.
 
-**The current holdout has been used twice,** so a new claim of improvement needs fresh PRs. Martian's benchmark has an [online version](https://github.com/withmartian/code-review-benchmark) that samples recent PRs. To use a different set, change the list in `real-prs.json`, using the `manifest` command in `prepare-real-prs.mjs` as a starting point.
+**Neither real-PR set is unseen any more:** the holdout has been used twice, and the first fresh test has been used once. A new claim of improvement needs a new sample. Write the plan and success rules first, as in [FRESH-TEST-PLAN.md](../evals/review-receipts/FRESH-TEST-PLAN.md), then draw it with a new seed using `prepare-fresh-prs.mjs`. Its answer key comes from what developers fixed after review, the same idea as [Martian's online benchmark](https://github.com/withmartian/code-review-benchmark).
 
 ## Extending it
 
@@ -130,6 +130,10 @@ For a skill that doesn't review code, you still need the same four things: cases
 **About skills and models:**
 
 - **A strong signal doesn't guarantee a better rule.** On one run per model over the development PRs, a spot raised by all three hunters matched a known issue about 48% of the time, against about 15% for a spot raised by one. So we tried requiring more proof for spots fewer hunters raised, and the checker enforced it. Over 3 runs each on Haiku, it averaged F1 45.1 against 47.7 without it, finding fewer known issues (64.3% vs. 70.5%) and removing almost no noise. We dropped the rule, and `agreement` remains for measuring the signal.
+- **Replaying old reports can mislead.** Replaying Haiku's reports with a cap of five findings predicted F1 of about 51, but rerunning with the cap scored 42.8, because models change what they write once a rule exists. Haiku also listed the "omitted" points anyway, which moved the noise rather than removing it. Use a replay to choose what to test, not to decide.
+- **Tighter reports traded recall for precision on Haiku.** Limiting questions and pre-existing findings cut Haiku's false positives per run from 54 to 37, but known issues found fell from 70.5% to 56.6%, leaving F1 about level. On Sonnet, 2 runs averaged 52.4 against 47.8 over 3 runs of the old version, on the development PRs. That's a small sample, so it needs fresh PRs to confirm.
+- **Test on code you haven't studied.** On a fresh sample, Opus judged 15% to 20% of findings false alarms, against about 6% for Sonnet on the benchmark we developed around. Rules chosen in advance also stopped a version that looked better overall from shipping, because its false-alarm rate rose.
+- **Keep the simpler version when a rule's gain is within noise.** Requiring code to be named before dropping what all three hunters raised averaged 53.9 against 52.4 on Sonnet and 46.9 against 46.7 on Haiku. That's smaller than the swing between identical runs, and it slowed runs, so we left it out.
 - **Instructions alone don't change behavior.** Models skipped steps they judged unnecessary, and said so. Three things helped: putting the step before the work it might be skipped in favor of, stating that the request authorizes it, and having a script reject incomplete notes.
 - **Bugs get missed at random.** On 15 development PRs, combining three separate Haiku reviews raised recall from about 47% to about 70%, and three Sonnet reviews from about 33% to about 49%. This counts recall only, so it says nothing about false positives.
 - **A cheaper model isn't always worse at hunting.** On one version, Haiku wrote down 4.9 suspects per run and Sonnet 3.2. Sonnet seemed to filter more before writing anything down, but we only saw the notes, not its reasoning.
