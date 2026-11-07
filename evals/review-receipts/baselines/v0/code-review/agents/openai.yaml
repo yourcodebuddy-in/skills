@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Review"
+  short_description: "Review correctness, performance, and code quality"
+  default_prompt: "Use $code-review to assess correctness, performance, clarity, maintainability, and unnecessary complexity; report supported findings and separate correctness and code-quality verdicts without changing code."

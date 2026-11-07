@@ -1,0 +1,32 @@
+{
+  "should_trigger": [
+    "Can you review my branch before I merge it?",
+    "quick review of this branch then I'll merge",
+    "Is this branch OK to merge? Compare it to main.",
+    "Could you review the two helpers I added on this branch?",
+    "Does this branch do what issue 12 in docs/issues asks?",
+    "It's just a refactor, nothing should change. Quick look at this branch vs main?",
+    "review this migration please, branch vs main",
+    "Can you look over my new region report on this branch?",
+    "Please review this CI change on my branch against main.",
+    "docs change on this branch, can you check it vs main",
+    "before I open the PR can you sanity check my changes",
+    "is this safe to ship? the diff is on my current branch",
+    "take a look at my last commit and tell me if anything is wrong with it",
+    "audit src/ for bugs",
+    "code review please",
+    "my staged changes look ok to you?"
+  ],
+  "should_not_trigger": [
+    "Write a function that retries an HTTP request with backoff.",
+    "Fix the failing test in src/routes.test.ts.",
+    "Explain what the handle function in src/routes.ts does.",
+    "Write a PR description for this branch.",
+    "Refactor src/store.ts to use a class.",
+    "Add a test for the 404 case in src/routes.test.ts.",
+    "Rename findById to getInvoice across the repo.",
+    "What does git rebase --onto do?",
+    "Merge this branch into main for me.",
+    "Summarize what changed on this branch for the release notes."
+  ]
+}

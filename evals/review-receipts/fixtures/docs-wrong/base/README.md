@@ -1,0 +1,3 @@
+# prune
+
+Deletes old backups.

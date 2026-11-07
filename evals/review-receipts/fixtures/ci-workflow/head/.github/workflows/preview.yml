@@ -1,0 +1,16 @@
+name: preview
+on: pull_request_target
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - run: make preview
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+      - run: echo "Preview for ${{ github.event.pull_request.title }} is ready"
