@@ -45,6 +45,7 @@ node evals/review-receipts/run.mjs import-tools --suite holdout --iteration tool
 node evals/review-receipts/run.mjs compliance --suite holdout --iteration final --configs with_skill --compare tools  # did the workflow run, and how did it score?
 node evals/review-receipts/run.mjs funnel --suite dev --iteration 1 --configs with_skill                              # then grade and report --iteration 1-funnel
 node evals/review-receipts/run.mjs union --suite dev --iteration 1 --configs with_skill                               # recall as repeated runs combine
+node evals/review-receipts/run.mjs agreement --suite dev --iteration 1 --configs with_skill                           # are spots more hunters raised more often real? Uses the judge
 ```
 
 ## Configurations
@@ -53,6 +54,7 @@ node evals/review-receipts/run.mjs union --suite dev --iteration 1 --configs wit
 | --- | --- |
 | `no_skill` | All skills and slash commands disabled |
 | `old_skill` | `baselines/v0/code-review`, an unchanged copy of the original skill |
+| `prev_skill` | The previous release. Extract it first with `mkdir -p workspace/review-receipts/baselines/v1.0 && git archive review-receipts-v1.0.0 skills/review-receipts \| tar -x -C workspace/review-receipts/baselines/v1.0` |
 | `with_skill` | `skills/review-receipts`, the working version |
 | `*_forced` | The same skill, with the prompt also naming it. Tests the instructions alone, whereas the plain config also tests whether the description fires |
 
@@ -67,7 +69,7 @@ Each run happens in a new temporary repo using `--setting-sources project`, so i
 - **Repo changed:** the review moved `HEAD` or left the worktree dirty, breaking the findings-only contract.
 - **Cost:** tokens, time, and report length.
 
-The judge reads the code, is told nothing about which configuration wrote a review, and uses a different model from the reviewer. Read its verdicts rather than trusting them blindly, because a judge can be wrong too.
+The judge reads the code, and is told nothing about which configuration wrote a review. A report's format can still reveal it. Unless you pick another with `--judge-model`, the judge is Sonnet, which is also the default reviewer, so use a stronger judge when the reviewer is Sonnet and independence matters. Read its verdicts rather than trusting them blindly, because a judge can be wrong too.
 
 ## Fixtures
 

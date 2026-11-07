@@ -2,6 +2,8 @@
 
 Measured on 2026-11-06 and 2026-11-07 in Claude Code. Raw output is in `workspace/review-receipts/`, which is git-ignored. [docs/BENCHMARKING.md](../../docs/BENCHMARKING.md) explains the method and how to repeat it.
 
+**What was measured:** pre-release builds named `evidence-review`. After the last real-PR and fixture runs, unused instructions for verifier subagents were removed, the skill was renamed `review-receipts`, and its description was reworded. None of this touched the rest of the instructions. The real-PR scores weren't rerun. The fixtures were rerun after the removal, and the trigger test after the rename and the new description.
+
 ## Real pull requests
 
 35 real PRs from Sentry, Grafana, Cal.com, Discourse, and Keycloak, from [Martian's Code Review Bench](https://github.com/withmartian/code-review-benchmark) (MIT). Another 15 PRs from the same set were used to develop the skill and aren't counted here. Each row is one run per PR, with the skill installed and not named in the prompt. Everything was scored by one judge, Claude Sonnet 5.5, published tools included, using the benchmark's published reviews and its default "core" issue categories.
@@ -19,13 +21,13 @@ Measured on 2026-11-06 and 2026-11-07 in Claude Code. Raw output is in `workspac
 | Sonnet + original skill | 40.2 | 60.9 | 48.4 | 5.1 | 36 s | $0.13 |
 | Sonnet, no skill | 35.9 | 69.6 | 47.3 | 6.5 | 33 s | $0.11 |
 | Haiku + original skill | 36.7 | 60.0 | 45.5 | 5.5 | 73 s | $0.02 |
-| Claude Code plugin | 50.0 | 41.7 | 45.5 | 2.9 | | |
+| Claude Code (CLI, as Martian names it) | 50.0 | 41.7 | 45.5 | 2.9 | | |
 | CodeRabbit | 34.0 | 61.7 | 43.8 | 6.4 | | |
 | Haiku, no skill | 28.6 | 67.8 | 40.2 | 8.0 | 42 s | $0.01 |
 
-The judge reproduced published scores on development PRs first. With Claude Opus 5.5 it gave Qodo Extended 68.4 against a published 69.1, and Augment 65.1 against 63.5. The Sonnet judge used here scores about 3 to 7 points higher than Opus, so compare within this table only, not with the published leaderboard.
+We checked the judge against published scores on the 15 development PRs first. It came within 2 points on two tools and within 6 on the other three (Claude Opus 5.5 as judge, against Martian's published Opus scores): Qodo Extended 68.4 vs. 69.1, Augment 65.1 vs. 63.5, Cubic 66.7 vs. 61.2, CodeRabbit 43.7 vs. 49.1, and the Claude Code CLI 41.0 vs. 47.1. This table uses Claude Sonnet 5.5 as judge, which scored 3 to 7 points higher than Opus on the two tools we compared directly. Compare within this table only, not with the published leaderboard. Sonnet also graded the Sonnet reviews, so that judge wasn't independent of the reviewer.
 
-**These 35 PRs have been used twice.** An earlier version scored Sonnet 57.0 and Haiku 45.9 on them. Reading those runs showed models often skipped the hunting passes, so the skill was changed to stop that, and the PRs were rerun. No finding or answer was tuned against, but this set is no longer fully unseen. The change helped Haiku and didn't help Sonnet, whose score moved within normal variation.
+**These 35 PRs have been used twice.** An earlier version scored Sonnet 57.0 and Haiku 45.9 on them. Reading those runs showed models often skipped the hunting passes, so the skill was changed to stop that, and the PRs were rerun. No finding or answer was tuned against, but this set is no longer fully unseen. Haiku then scored higher and Sonnet about the same, with one run each, so this doesn't show the change caused either result.
 
 ## Are the unmatched findings actually wrong?
 
@@ -35,16 +37,16 @@ Checked by Claude Opus 5.5, a stronger model than the one that wrote the Sonnet 
 
 | | Findings | Real issues | Nits | False alarms | Invented | Inflated severity |
 | --- | --- | --- | --- | --- | --- | --- |
-| Sonnet + this skill | 143 | 114 (80%) | 16 | 8 (6%) | 2 | 9 |
+| Sonnet + this skill | 145 | 116 (80%) | 16 | 8 (6%) | 2 | 9 |
 | Qodo Extended | 108 | 93 (86%) | 9 | 6 (6%) | 2 | 17 |
 
 Checked by Claude Sonnet 5.5, so not directly comparable with the table above:
 
 | | Findings | Real issues | Nits | False alarms | Invented | Inflated severity |
 | --- | --- | --- | --- | --- | --- | --- |
-| Haiku + this skill | 219 | 165 (75%) | 38 | 7 (3%) | 0 | 30 |
+| Haiku + this skill | 223 | 169 (76%) | 38 | 7 (3%) | 0 | 30 |
 
-Only Qodo Extended got this check among the published tools. Issues that matched the known list were counted as real without being rechecked.
+Only Qodo Extended got this check among the published tools. Issues that matched the known list were counted as real without being rechecked. Rows don't sum to the total, because findings judged out of scope or unverifiable aren't shown.
 
 ## Traps and project types
 
@@ -97,8 +99,8 @@ These were spot checks on a version just before the final process change, not me
 ## Limits
 
 - One run per PR and per fixture, and one host for all the measurements.
-- F1 varies between identical runs. Three runs of one Sonnet version on the same 15 development PRs scored 44.2, 33.3, and 32.1, so don't trust a small gap between neighbors in the table.
-- Published tools may have seen these public PRs in training, as may the models behind this skill. Martian's own README warns of this. Published reviews also come from each vendor's own run, on its own date.
+- F1 varies between identical runs. The widest spread we saw was on 15 development PRs, where three runs of one Sonnet version scored 44.2, 33.3, and 32.1. Other repeats differed by less, such as 38.5, 41.2, and 38.0 on Haiku. Don't trust a small gap between neighbors in the table.
+- Published tools may have seen these public PRs in training, as may the models behind this skill. Martian's own README warns of this. Published reviews are Martian's own runs of each tool, each on its own date.
 - Judges made errors that were caught by running code or by a stronger model, so treat single verdicts with care.
 - Runs needed a working `python3` and a shell. The checker's manual fallback wasn't measured.
 - After these runs, unused instructions for verifier subagents were removed, since none of the 70 real-PR runs started them. The real-PR scores weren't rerun. The final text then got a regression run on Haiku across the 32 fixtures: 32 of 33 problems found, 1 false alarm, 0 invented claims, 3 inflated severities, 27 of 31 on merge advice, no injection obeyed, and no repo changes. That's within normal variation of the table above.

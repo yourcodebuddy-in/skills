@@ -2,7 +2,7 @@
 
 **Code reviews that show their receipts.**
 
-A code review skill for AI agents that works on any language or kind of project. It reports only findings it has checked against the code, gives each one a severity based on what would actually go wrong, and says plainly when the code is fine.
+A code review skill for AI agents, designed for any language or kind of project. It checks each finding against the code before reporting it, gives each one a severity based on what would actually go wrong, and says plainly when the code is fine. It was tested on Python, Go, TypeScript, Ruby and Java pull requests, plus small test changes in other languages.
 
 ```markdown
 **Verdict: Don't merge yet.** A retry can charge a customer twice.
@@ -33,10 +33,10 @@ Most review mistakes have a mechanical cause, so the skill tackles them mechanic
 
 | Problem | What the skill does |
 | --- | --- |
-| Bugs get missed at random | Three independent hunting passes that can't see each other. On development PRs, three cheap passes together found about 70% of known issues, against 47% for one |
+| Bugs get missed at random | Three independent hunting passes that can't see each other. On 15 development PRs, combining three separate Haiku reviews raised the share of known issues found from 47% to 70%, not counting false positives |
 | Wrong findings | A verification step tries to disprove each suspicion by reading the code |
 | Invented code or APIs | A script checks every cited line against the real file, and claims about an API must be checked rather than remembered |
-| Skipped steps | The same script rejects the notes if a changed file or suspicion isn't accounted for, whichever model is running |
+| Skipped steps | The same script rejects submitted notes if a changed file or suspicion isn't accounted for. It only helps when it runs: runs reached its PASS on 27 of 35 PRs on Sonnet and 22 of 35 on Haiku |
 | Minor issues treated as deal breakers | Severity comes from one question: if this merged today and nobody touched it for a month, what exactly goes wrong, and for whom? |
 | Contradictory verdicts | The verdict follows a fixed rule based on the findings |
 | Overbuilt fixes | Each fix is the smallest change that removes the cause |
@@ -45,25 +45,25 @@ Most review mistakes have a mechanical cause, so the skill tackles them mechanic
 
 ## Results
 
-Measured on real pull requests that weren't used to develop the skill. See [evals/review-receipts/RESULTS.md](../../evals/review-receipts/RESULTS.md) for the method, the full tables, and the limits, including that these PRs were used twice.
+Measured on 35 real pull requests kept out of development, though the skill was revised once after reading its runs on them. Each row is one run per PR, scored by one judge. See [evals/review-receipts/RESULTS.md](../../evals/review-receipts/RESULTS.md) for the method, the full tables, and the limits.
 
 | On 35 real PRs | Recall | F1 | Reported cost per PR |
 | --- | --- | --- | --- |
-| Qodo Extended, the top published tool | 60.0 | 61.9 | |
+| Qodo Extended, the top of the 8 published tools we scored | 60.0 | 61.9 | |
 | Sonnet + this skill | 61.7 | 55.0 | $0.33 |
 | Haiku + this skill | 74.8 | 51.5 | $0.08 |
 | Sonnet, no skill | 69.6 | 47.3 | $0.11 |
-| Claude Code plugin | 41.7 | 45.5 | |
+| Claude Code (CLI, as Martian names it) | 41.7 | 45.5 | |
 | Haiku, no skill | 67.8 | 40.2 | $0.01 |
 
 F1 counts anything missing from the benchmark's list of known issues as wrong, but that list is incomplete. Checked against the real code by a stronger model, the same reviews compare like this:
 
 | | Real issues found | False alarms | Invented |
 | --- | --- | --- | --- |
-| Sonnet + this skill | 114 of 143 | 8 | 2 |
+| Sonnet + this skill | 116 of 145 | 8 | 2 |
 | Qodo Extended | 93 of 108 | 6 | 2 |
 
-Only Qodo Extended got this deeper check among the published tools. On 32 small test changes across many project types, Sonnet with the skill found all 33 planted problems, with no false alarms, invented claims, or inflated severity.
+Only Qodo Extended got this deeper check among the published tools, and Qodo's findings were more often real (86% vs. 80%). On 32 small test changes across many project types, Sonnet with the skill found all 33 planted problems, with no false alarms, invented claims, or inflated severity, in one run each. Those test changes were also used during development, so treat that as a check, not a score.
 
 ## Choosing a model
 
@@ -80,4 +80,4 @@ A review takes longer than a single pass, at about three minutes per PR in testi
 
 ## Credits
 
-The real-PR test set comes from [Martian's Code Review Bench](https://github.com/withmartian/code-review-benchmark) (MIT). The multi-pass idea was also reported by [Cursor](https://cursor.com/blog/building-bugbot), and the blocking and non-blocking distinction draws on [Google's code review guide](https://google.github.io/eng-practices/review/) and [Conventional Comments](https://conventionalcomments.org/).
+The real-PR test set comes from [Martian's Code Review Bench](https://github.com/withmartian/code-review-benchmark) (MIT). [Cursor](https://cursor.com/blog/building-bugbot) also reported using multiple passes in Bugbot's launch version. Leaving out minor points draws on [Google's code review guide](https://google.github.io/eng-practices/review/) and its "Nit:" convention, and [Conventional Comments](https://conventionalcomments.org/) labels comments as blocking or non-blocking.

@@ -11,12 +11,12 @@ Each rule exists because skipping it misled us or would have.
 3. **Prove the test cases.** Every planted bug has a script showing it really happens, and every "clean" change has one showing it really is clean. A fake bug makes every score meaningless.
 4. **Keep some data unseen.** Develop on one set of PRs and report on another. Once you've chosen a change because of a set's results, that set is no longer unseen.
 5. **Calibrate the judge.** Before trusting your judge, score published tools with it and check that it reproduces their published numbers.
-6. **Use one judge for everyone.** Judges differ. Our Sonnet judge scored 3 to 7 points higher than our Opus judge, so scores only compare within one judge. Put published tools through the same judge as your own runs.
-7. **Don't trust the answer key alone.** Known-issue lists are incomplete. Check unmatched findings against the real code, because in one check 45 of 63 "false positives" were real issues.
+6. **Use one judge for everyone.** Judges differ. On the two tools we compared directly, our Sonnet judge scored 3 to 7 points higher than our Opus judge, so scores only compare within one judge. Put published tools through the same judge as your own runs.
+7. **Don't trust the answer key alone.** Known-issue lists are incomplete. Check unmatched findings against the real code. In one check of an earlier version, 45 of 63 findings counted as false positives were judged real issues.
 8. **Check what really ran.** A skill's instructions aren't its behavior. Read the transcripts to see whether the steps happened before crediting or blaming them.
-9. **Repeat runs before believing a gap.** Identical runs on the same 15 PRs scored F1 44.2, 33.3, and 32.1.
+9. **Repeat runs before believing a gap.** Identical runs on the same 15 PRs have scored as far apart as F1 44.2 and 32.1.
 10. **Have a stronger model recheck strong claims,** and run the code yourself when you can. Rechecking moved "0 false alarms" to 3, and running a C program overturned two judge verdicts.
-11. **Watch usage.** Model runs draw on your plan or budget. Grading has cost about as much as the reviews.
+11. **Watch usage.** Model runs draw on your plan or budget. On Haiku runs, grading has cost about as much as the reviews.
 
 ## What we measure
 
@@ -73,7 +73,7 @@ node evals/review-receipts/run.mjs grade --suite dev --iteration my-change-real-
 node evals/review-receipts/run.mjs report --suite dev --iteration my-change-real-funnel
 ```
 
-If recall on the hunters' list is low, the hunt failed. If it's high and the report's recall is low, the merge or the verification lost the bugs. In our runs the hunters reached about 74%, while reports reached about 49%, which pointed straight at the merge step.
+If recall on the hunters' list is low, the hunt failed. If it's high and the report's recall is low, the merge or the verification lost the bugs. In one Sonnet run over the development PRs, the hunters' lists together covered 84% of known issues while the report covered 56%. On Haiku the gap was much smaller, at 78% and 76%.
 
 ## Reporting a result
 
@@ -122,16 +122,17 @@ For a skill that doesn't review code, you still need the same four things: cases
 **Mistakes in measurement:**
 
 - **One run looks like a result.** We credited a jump from F1 27.8 to 48.7 to a new instruction. The transcripts showed the models never followed it, so it was mostly noise.
-- **Comparing runs that chose for themselves.** Runs that used the hunters scored 66.7 and looked like the answer. Fair comparison on identical PRs shrank the gap, and forcing the hunters on every run didn't raise Sonnet's score. Use `--compare`.
+- **Comparing runs that chose for themselves.** On an earlier version, Sonnet runs that used the hunters scored 63.0 and runs that skipped them scored 46.0, which looked like the answer. But the top tool also scored higher on the PRs where hunters ran (64.9 vs. 56.0), so part of the gap came from the PRs themselves. Then making nearly every run use the hunters didn't raise Sonnet's overall score. Use `--compare`.
 - **Scoring the last message.** A host can send a closing message after the report, which then gets scored in its place. The runner now scores the report itself.
 - **Recording failures as results.** Hitting a usage limit once wrote 60 failed runs that looked like scores of zero. The runner now stops at the limit and can resume.
 - **Trusting a judge too far.** Judges made real errors. Rerun or read anything surprising.
 
 **About skills and models:**
 
+- **A strong signal doesn't guarantee a better rule.** On one run per model over the development PRs, a spot raised by all three hunters matched a known issue about 48% of the time, against about 15% for a spot raised by one. So we tried requiring more proof for spots fewer hunters raised, and the checker enforced it. Over 3 runs each on Haiku, it averaged F1 45.1 against 47.7 without it, finding fewer known issues (64.3% vs. 70.5%) and removing almost no noise. We dropped the rule, and `agreement` remains for measuring the signal.
 - **Instructions alone don't change behavior.** Models skipped steps they judged unnecessary, and said so. Three things helped: putting the step before the work it might be skipped in favor of, stating that the request authorizes it, and having a script reject incomplete notes.
-- **Bugs get missed at random.** Combining independent runs raised recall from about 47% to about 70%, on a cheap model.
-- **A cheap model can out-hunt an expensive one.** Haiku listed more suspects than Sonnet, and Sonnet talked itself out of more before writing them down.
+- **Bugs get missed at random.** On 15 development PRs, combining three separate Haiku reviews raised recall from about 47% to about 70%, and three Sonnet reviews from about 33% to about 49%. This counts recall only, so it says nothing about false positives.
+- **A cheaper model isn't always worse at hunting.** On one version, Haiku wrote down 4.9 suspects per run and Sonnet 3.2. Sonnet seemed to filter more before writing anything down, but we only saw the notes, not its reasoning.
 - **Filtering is where recall goes.** No-skill runs report nearly everything, so they have high recall and poor precision. Any filter trades some recall for precision, so measure both.
 - **Separate noise from false alarms.** Most unmatched findings weren't wrong. They were real bugs missing from the list, or true but unimportant nits, and each needs a different fix.
 - **Unused instructions are dead weight.** Verifier subagents were started in only a handful of runs of an earlier version and in none of the last 70, so we removed them.

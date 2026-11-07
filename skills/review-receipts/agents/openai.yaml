@@ -1,4 +1,4 @@
 interface:
   display_name: "Review Receipts"
-  short_description: "Verified code review with severity you can trust"
+  short_description: "Code review that checks each finding against the code"
   default_prompt: "Use $review-receipts to review this change. Report only verified findings and don't change any code."

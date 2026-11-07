@@ -1,6 +1,6 @@
 ---
 name: review-receipts
-description: Reviews code and reports only verified findings, with a severity the evidence supports. Use whenever someone wants a second opinion on code or a change that already exists, whatever words they use, such as review, check, look over, take a look, sanity check, audit, is it OK or safe to merge or ship, is anything wrong with it, or does it do what an issue or spec asks. Covers branches, diffs, pull requests, commits, staged changes, migrations, scripts, config, docs, and infrastructure, in any language, including quick looks and changes described as trivial or just a refactor.
+description: Reviews code and checks each finding against the code before reporting it, with a severity based on what would actually go wrong. Use whenever someone wants a second opinion on code or a change that already exists, whatever words they use, such as review, check, look over, take a look, sanity check, audit, is it OK or safe to merge or ship, is anything wrong with it, or does it do what an issue or spec asks. Covers branches, diffs, pull requests, commits, staged changes, migrations, scripts, config, docs, and infrastructure, in any language, including quick looks and changes described as trivial or just a refactor.
 license: MIT
 metadata:
   version: "1.0.0"

@@ -1,16 +1,16 @@
 # Agent Skills
 
-Agent skills that work on any project and are measured before they're trusted. Each one is a plain [Agent Skills](https://agentskills.io) folder, so it works with Claude Code, Codex, Cursor, and other agents that support the format.
+Agent skills built to work on any project and measured before release. Each one is a plain [Agent Skills](https://agentskills.io) folder, which any agent that supports the format can load. Each skill's results say which agents it was actually tested on.
 
 ## Skills
 
 | Skill | What it does | Details |
 | --- | --- | --- |
-| [review-receipts](skills/review-receipts/SKILL.md) | Reviews code and reports only findings it has checked against the code, with a severity based on what would actually go wrong | [Docs and results](docs/skills/review-receipts.md) |
+| [review-receipts](skills/review-receipts/SKILL.md) | Reviews code and checks each finding against the code before reporting it, with a severity based on what would actually go wrong | [Docs and results](docs/skills/review-receipts.md) |
 
 ### How review-receipts was tested
 
-Tested on 35 real pull requests from Sentry, Grafana, Cal.com, Discourse and Keycloak, using Martian's open Code Review Bench.
+Tested on 35 real pull requests from Sentry, Grafana, Cal.com, Discourse and Keycloak, using Martian's open Code Review Bench and our own judge, with one run per PR. These PRs were kept out of development, though the skill was revised once after reading its runs on them.
 
 | | With no skill | With review-receipts |
 | --- | --- | --- |
@@ -19,7 +19,7 @@ Tested on 35 real pull requests from Sentry, Grafana, Cal.com, Discourse and Key
 | Haiku: overall score (F1) | 40.2 | 51.5 |
 | Haiku: known issues found | 67.8% | 74.8% |
 
-The top published tool scored 61.9, so this isn't the leader on overall score. [Full results, limits and method](evals/review-receipts/RESULTS.md).
+Of the 8 published tools we scored with the same judge, the top one scored 61.9, so this isn't the leader on overall score. [Full results, limits and method](evals/review-receipts/RESULTS.md).
 
 ## Install
 
