@@ -12,11 +12,13 @@ Read [docs/BENCHMARKING.md](docs/BENCHMARKING.md) first. Judge a change by measu
 
 - Keep each skill general and self-contained. It must not refer to other skills, since users may install it alone.
 - Keep tests and benchmark data out of `skills/`, because the installer copies those folders to users.
-- Tune only on development data. For `review-receipts`, that's `--suite dev` and the fixtures. Results from `--suite holdout` and `--suite fresh` are for reporting, and using them to choose changes makes them meaningless. Both sets are now used, so a new claim needs a new sample, with its rules written first.
+- Tune only on development data. For `review-receipts`, that's `--suite dev` and the fixtures. Results from `--suite holdout`, `--suite fresh` and `--suite fresh2` are for reporting, and using them to choose changes makes them meaningless. Both sets are now used, so a new claim needs a new sample, with its rules written first.
 - After changing anything in `skills/`, run `node scripts/check-skills.mjs` and that skill's own tests. For `review-receipts`, those are `python3 evals/review-receipts/test_check_review.py` and `node evals/review-receipts/run.mjs proofs`.
 - When you publish new numbers, update the skill's `RESULTS.md` and its page in `docs/skills/` together, and report weak results as plainly as strong ones.
 
 ## Before running a benchmark
+
+Every agent and fixture command must run under `evals/<name>/sandbox.sb`, as `run.mjs` does. Never add a way to launch an agent or run fixture code outside it, because agents run with all permissions and one deleted real files.
 
 Model runs use the account owner's plan or API budget, and a full comparison has reached a 5-hour usage limit before. Say how large a run will be and get approval first. Start with a few cases and one model.
 

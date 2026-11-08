@@ -10,7 +10,7 @@ Agent skills built to work on any project and measured before release. Each one 
 
 ### How review-receipts was tested
 
-Tested on 35 real pull requests from Sentry, Grafana, Cal.com, Discourse and Keycloak, using Martian's open Code Review Bench and our own judge, with one run per PR. These PRs were kept out of development, though the skill was revised once after reading its runs on them.
+Version 1.0.0 was tested on 35 real pull requests from Sentry, Grafana, Cal.com, Discourse and Keycloak, using Martian's open Code Review Bench and our own judge, with one run per PR. These PRs were kept out of development, though the skill was revised once after reading its runs on them.
 
 | | With no skill | With review-receipts |
 | --- | --- | --- |
@@ -21,7 +21,9 @@ Tested on 35 real pull requests from Sentry, Grafana, Cal.com, Discourse and Key
 
 Of the 8 published tools we scored with the same judge, the top one scored 61.9, so this isn't the leader on overall score. [Full results, limits and method](evals/review-receipts/RESULTS.md).
 
-**A later test found more false alarms.** On 35 newer PRs from 35 other projects, with one run per PR, the current version still scored higher than no skill (F1 26.7 vs. 23.5 on Sonnet, 21.3 vs. 12.0 on Haiku). But Claude Opus judged 18% of its Sonnet findings and 15% of its Haiku findings to be false alarms, well above the 6% measured on Sonnet in the table's test. Expect the higher figure on your own code. [Fresh test results](evals/review-receipts/FRESH-TEST-RESULTS.md).
+**A later test found more false alarms.** On 35 newer PRs from 35 other projects, with one run per PR, 1.0.0 still scored higher than no skill (F1 26.7 vs. 23.5 on Sonnet, 21.3 vs. 12.0 on Haiku). But Claude Opus judged 18% of its Sonnet findings and 15% of its Haiku findings to be false alarms, well above the 6% measured on Sonnet in the table's test. Expect the higher figure on your own code. [Fresh test results](evals/review-receipts/FRESH-TEST-RESULTS.md).
+
+**Version 1.1.0 was compared with 1.0.0 on another 35 fresh PRs,** under rules written in advance, and passed on both models. Opus judged 3% of the Sonnet findings to be false alarms, against 13% for 1.0.0. On Haiku it was 16% against 17%, but Haiku also found fewer of the known defects, 19 of 88 against 30. 1.1.0 wasn't rerun on the benchmark above. [Second fresh test results](evals/review-receipts/FRESH-TEST-2-RESULTS.md).
 
 ## Install
 

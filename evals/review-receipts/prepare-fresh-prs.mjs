@@ -5,26 +5,32 @@
 //   node evals/review-receipts/prepare-fresh-prs.mjs build      makes a local repo for each PR, taking reserves for any that fail
 //   node evals/review-receipts/prepare-fresh-prs.mjs key        builds the answer key with a judge. Uses model usage
 //   node evals/review-receipts/prepare-fresh-prs.mjs import-bots  copies each bot's comments into iteration-fresh-bots for grading
+// Add --set 2 to any of these except search, for a second sample.
 //
 // The version under review is the PR as it stood before its first review, so later fixes can't leak in.
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../..");
 const CACHE = join(ROOT, "workspace/review-receipts/cache/fresh");
-const MANIFEST = join(HERE, "fresh-prs.json");
-const SUITE = join(ROOT, "workspace/review-receipts/cache/fresh-prs.json");
+// --set 2 draws another sample from the same search, leaving out every repo in earlier samples.
+const SET_FLAG = process.argv.indexOf("--set");
+const SAMPLE = SET_FLAG > 0 ? Number(process.argv[SET_FLAG + 1]) : 1;
+const SUFFIX = SAMPLE > 1 ? `-${SAMPLE}` : "";
+const MANIFEST = join(HERE, `fresh-prs${SUFFIX}.json`);
+const SUITE = join(ROOT, `workspace/review-receipts/cache/fresh-prs${SUFFIX}.json`);
+const SEEDS = { 1: "fresh-2026-11-07", 2: "fresh-2-2026-11-08" };
 const SNAPSHOTS = join(ROOT, "workspace/review-receipts/cache/snapshots");
-const BOT_ITERATION = join(ROOT, "workspace/review-receipts/iteration-fresh-bots");
+const BOT_ITERATION = join(ROOT, `workspace/review-receipts/iteration-fresh${SUFFIX}-bots`);
 
 // All fixed in FRESH-TEST-PLAN.md.
-const SEED = "fresh-2026-11-07";
+const SEED = SEEDS[SAMPLE];
 // One search per month, so results aren't all from the end of the window.
 const MERGED_WINDOWS = ["2026-08-01..2026-08-31", "2026-09-01..2026-09-30", "2026-10-01..2026-10-31"];
 const MIN_STARS = 500;
@@ -233,8 +239,13 @@ function select() {
   const candidates = JSON.parse(readFileSync(join(CACHE, "candidates.json"), "utf8"));
   const reasons = {};
   const qualified = [];
+  const earlier = new Set();
+  for (let n = 1; n < SAMPLE; n += 1) {
+    const { withFixes, withoutFixes } = JSON.parse(readFileSync(join(HERE, `fresh-prs${n > 1 ? `-${n}` : ""}.json`), "utf8"));
+    [...withFixes, ...withoutFixes].forEach((p) => earlier.add(p.repo));
+  }
   for (const candidate of candidates) {
-    const result = qualify(candidate);
+    const result = earlier.has(candidate.repo.nameWithOwner) ? "repo in an earlier sample" : qualify(candidate);
     if (typeof result === "string") reasons[result] = (reasons[result] ?? 0) + 1;
     else qualified.push(result);
   }
@@ -379,7 +390,7 @@ async function buildKey() {
           if (patches.length > MAX_PATCH_CHARS) break;
         }
         const cwd = mkdtempSync(join(tmpdir(), "er-key-"));
-        const result = spawnSync("claude", ["-p", keyPrompt(pr, patches.slice(0, MAX_PATCH_CHARS)), "--model", JUDGE_MODEL, "--setting-sources", "", "--strict-mcp-config", "--disable-slash-commands", "--no-session-persistence", "--permission-mode", "bypassPermissions", "--disallowedTools", "Bash,Read,Write,Edit,Grep,Glob,Agent,Task,WebSearch,WebFetch", "--json-schema", JSON.stringify(KEY_SCHEMA), "--output-format", "json"], { cwd, encoding: "utf8", maxBuffer: 1 << 28, input: "" });
+        const result = spawnSync("sandbox-exec", ["-f", join(HERE, "sandbox.sb"), "-D", `HOME=${homedir()}`, "claude", "-p", keyPrompt(pr, patches.slice(0, MAX_PATCH_CHARS)), "--model", JUDGE_MODEL, "--setting-sources", "", "--strict-mcp-config", "--disable-slash-commands", "--no-session-persistence", "--permission-mode", "bypassPermissions", "--disallowedTools", "Bash,Read,Write,Edit,Grep,Glob,Agent,Task,WebSearch,WebFetch", "--json-schema", JSON.stringify(KEY_SCHEMA), "--output-format", "json"], { cwd, encoding: "utf8", maxBuffer: 1 << 28, input: "" });
         rmSync(cwd, { recursive: true, force: true });
         if (/hit your .*limit|usage_limit_reached/i.test(result.stdout)) {
           console.error("Usage limit reached. Rerun after it resets.");

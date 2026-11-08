@@ -36,7 +36,7 @@ node evals/review-receipts/run.mjs validate --suite holdout --iteration final   
 node evals/review-receipts/run.mjs report --suite holdout --iteration final
 ```
 
-`--suite dev` is the 15 PRs for developing the skill. `--suite holdout` is the other 35. Tuning against the holdout makes its scores meaningless. Results for version 1.0.0 are in `RESULTS.md`.
+`--suite dev` is the 15 PRs for developing the skill. `--suite holdout` is the other 35. Tuning against the holdout makes its scores meaningless. Results for version 1.0.0 are in `RESULTS.md`. Version 1.1.0 was compared with 1.0.0 on fresh PRs, in `FRESH-TEST-2-RESULTS.md`.
 
 ## Fresh PRs
 
@@ -50,6 +50,8 @@ node evals/review-receipts/prepare-fresh-prs.mjs key            # answer key, us
 node evals/review-receipts/prepare-fresh-prs.mjs import-bots
 node evals/review-receipts/run.mjs run --suite fresh --iteration fresh --configs prev_skill,with_skill
 ```
+
+`--set 2` on every step except `search` draws a second sample from the same search, leaving out the repositories in the first, and `--suite fresh2` runs it. Both samples are now used.
 
 ## Analyses
 
@@ -72,6 +74,8 @@ node evals/review-receipts/run.mjs agreement --suite dev --iteration 1 --configs
 | `*_forced` | The same skill, with the prompt also naming it. Tests the instructions alone, whereas the plain config also tests whether the description fires |
 
 Each run happens in a new temporary repo using `--setting-sources project`, so it sees none of your personal instructions or skills, plus no MCP servers or web tools. Paths and branch names are neutral so they can't hint at the answer.
+
+Every agent and fixture command runs under `sandbox.sb` with macOS `sandbox-exec`, which denies writes everywhere except temp folders, Claude's own state, and caches. Agents run with all permissions, and one testing a fixture's deletion script once deleted most of a home folder's Desktop. The runner stops if the sandbox can't start, so it currently needs macOS.
 
 ## What counts
 

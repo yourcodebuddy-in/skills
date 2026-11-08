@@ -34,18 +34,19 @@ Most review mistakes have a mechanical cause, so the skill tackles them mechanic
 | Problem | What the skill does |
 | --- | --- |
 | Bugs get missed at random | Three independent hunting passes that can't see each other. On 15 development PRs, combining three separate Haiku reviews raised the share of known issues found from 47% to 70%, not counting false positives |
-| Wrong findings | A verification step tries to disprove each suspicion by reading the code |
+| Wrong findings | A verification step tries to disprove each suspicion by reading the code. Then a fresh subagent that didn't raise the findings tries to refute them |
 | Invented code or APIs | A script checks every cited line against the real file, and claims about an API must be checked rather than remembered |
-| Skipped steps | The same script rejects submitted notes if a changed file or suspicion isn't accounted for. It only helps when it runs: runs reached its PASS on 27 of 35 PRs on Sonnet and 22 of 35 on Haiku |
+| Skipped steps | The same script rejects submitted notes if a changed file or suspicion isn't accounted for. It only helps when it runs: in testing of 1.0.0, runs reached its PASS on 27 of 35 PRs on Sonnet and 22 of 35 on Haiku |
 | Minor issues treated as deal breakers | Severity comes from one question: if this merged today and nobody touched it for a month, what exactly goes wrong, and for whom? |
 | Contradictory verdicts | The verdict follows a fixed rule based on the findings |
 | Overbuilt fixes | Each fix is the smallest change that removes the cause |
 | Noise | Minor points are counted but not listed, and you can ask to see them |
 | Prompt injection in the code under review | Everything under review is treated as data, and project rules are read from the base branch |
+| Code under review that deletes files | It runs code only in a throwaway copy, with its home folder and paths inside a temp directory, and traces anything it can't confine that way |
 
 ## Results
 
-Measured on 35 real pull requests kept out of development, though the skill was revised once after reading its runs on them. Each row is one run per PR, scored by one judge. See [evals/review-receipts/RESULTS.md](../../evals/review-receipts/RESULTS.md) for the method, the full tables, and the limits.
+Version 1.0.0 was measured on 35 real pull requests kept out of development, though the skill was revised once after reading its runs on them. Each row is one run per PR, scored by one judge. See [evals/review-receipts/RESULTS.md](../../evals/review-receipts/RESULTS.md) for the method, the full tables, and the limits.
 
 | On 35 real PRs | Recall | F1 | Reported cost per PR |
 | --- | --- | --- | --- |
@@ -67,12 +68,23 @@ Only Qodo Extended got this deeper check among the published tools, and Qodo's f
 
 **A later test found more false alarms.** On 35 newer PRs from 35 other projects, Claude Opus judged 18% of the Sonnet findings and 15% of the Haiku findings to be false alarms, against the 6% above. Only 65% of Sonnet's findings and 37% of Haiku's were real issues. Expect these higher figures on your own code. See [the fresh test results](../../evals/review-receipts/FRESH-TEST-RESULTS.md).
 
+**Version 1.1.0 was compared with 1.0.0 on another 35 fresh PRs,** under rules written in advance, and passed on both models. It wasn't rerun on the benchmark above. One run per PR, with findings outside the answer key checked by Claude Opus:
+
+| On 35 fresh PRs | Findings | Real issues | False alarms | Invented | Known defects found |
+| --- | --- | --- | --- | --- | --- |
+| Sonnet + 1.0.0 | 46 | 32 | 6 (13%) | 2 | 19 of 88 |
+| Sonnet + 1.1.0 | 39 | 33 | 1 (3%) | 0 | 23 of 88 |
+| Haiku + 1.0.0 | 133 | 50 | 22 (17%) | 6 | 30 of 88 |
+| Haiku + 1.1.0 | 69 | 38 | 11 (16%) | 3 | 19 of 88 |
+
+On Haiku, 1.1.0 trades recall for fewer findings. On the small test changes, Sonnet with 1.1.0 found 32 of 33 planted problems and gave the right merge advice on 26 of 31, against 33 and 31 for 1.0.0, in one run each. See [the second fresh test results](../../evals/review-receipts/FRESH-TEST-2-RESULTS.md).
+
 ## Choosing a model
 
 The main agent's model sets the tradeoff. Either way, the hunting passes run on the cheapest model available.
 
-- **A mid-tier model such as Sonnet** gives cleaner reports: about 4 issues per PR and better merge advice.
-- **A cheap model such as Haiku** finds more and costs about a quarter as much, but reports about 6 issues per PR, with more nits and more inflated severity. Plan to read those reports critically.
+- **A mid-tier model such as Sonnet** gives cleaner reports and better merge advice. On fresh PRs, 1.1.0 reported about 1 issue per PR, and Opus judged 3% of them false alarms.
+- **A cheap model such as Haiku** costs about a quarter as much. On fresh PRs, 1.1.0 reported about 2 issues per PR, with 16% judged false alarms, and found fewer of the known defects than Sonnet or than Haiku with 1.0.0. Plan to read those reports critically.
 
 A review takes longer than a single pass, at about three minutes per PR in testing, and uses more tokens. Trivial changes take one short pass.
 

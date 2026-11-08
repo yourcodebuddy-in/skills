@@ -92,7 +92,7 @@ node evals/review-receipts/run.mjs compliance --suite holdout --iteration final 
 
 Then run the fixtures and `trigger` on each model, and update `RESULTS.md` and the skill's page in `docs/skills/`.
 
-**Neither real-PR set is unseen any more:** the holdout has been used twice, and the first fresh test has been used once. A new claim of improvement needs a new sample. Write the plan and success rules first, as in [FRESH-TEST-PLAN.md](../evals/review-receipts/FRESH-TEST-PLAN.md), then draw it with a new seed using `prepare-fresh-prs.mjs`. Its answer key comes from what developers fixed after review, the same idea as [Martian's online benchmark](https://github.com/withmartian/code-review-benchmark).
+**No real-PR set is unseen any more:** the holdout has been used twice, and each of the two fresh samples once. A new claim of improvement needs a new sample. Write the plan and success rules first, as in [FRESH-TEST-PLAN.md](../evals/review-receipts/FRESH-TEST-PLAN.md), then draw it with a new seed using `prepare-fresh-prs.mjs`. Its answer key comes from what developers fixed after review, the same idea as [Martian's online benchmark](https://github.com/withmartian/code-review-benchmark).
 
 ## Extending it
 
@@ -126,6 +126,8 @@ For a skill that doesn't review code, you still need the same four things: cases
 - **Scoring the last message.** A host can send a closing message after the report, which then gets scored in its place. The runner now scores the report itself.
 - **Recording failures as results.** Hitting a usage limit once wrote 60 failed runs that looked like scores of zero. The runner now stops at the limit and can resume.
 - **Trusting a judge too far.** Judges made real errors. Rerun or read anything surprising.
+- **Letting agents touch the real machine.** A reviewer testing a fixture's cleanup script mistyped a variable, so the script ran `rm -rf` in the real home folder and deleted most of the Desktop before the agent stopped it. Its report said so in its first line, but only scores were read. Every agent now runs in a sandbox that can only write to temp folders, and fixtures that delete files are traced rather than run.
+- **Reading scores without reading reports.** The deletion above was in a report that scored normally. Read a sample of reports, and every report from a run where something unexpected happened.
 
 **About skills and models:**
 
@@ -146,7 +148,8 @@ For a skill that doesn't review code, you still need the same four things: cases
 ## Still open
 
 - **Precision.** The top tools report fewer non-issues. This is the main gap, especially on Haiku.
-- **Workflow completion.** The checker reached PASS on 27 of 35 Sonnet runs and 22 of 35 Haiku runs.
+- **Workflow completion.** In testing of 1.0.0, the checker reached PASS on 27 of 35 Sonnet runs and 22 of 35 Haiku runs.
+- **Haiku's recall in 1.1.0,** which found 19 of 88 known defects on fresh PRs, against 30 for 1.0.0.
 - **Haiku's merge advice,** which was right on 26 to 27 of 31 fixtures in the last two runs.
 - **Other hosts.** Subagents are untested on Codex, and other agents haven't been tried.
-- **Fresh PRs,** for any new claim about real-PR performance.
+- **Fresh PRs,** for any new claim about real-PR performance. Both samples drawn so far are used.

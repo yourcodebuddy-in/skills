@@ -1,0 +1,14 @@
+(version 1)
+; Every eval agent and fixture command runs under this profile, so code under review can't
+; change real files. Writes are denied everywhere except temp folders, Claude's own state and caches.
+; Run as: sandbox-exec -f sandbox.sb -D HOME=<home> <command>
+(allow default)
+(deny file-write*)
+(allow file-write*
+  (subpath "/private/tmp")
+  (subpath "/private/var/folders")
+  (subpath "/dev")
+  (prefix (string-append (param "HOME") "/.claude"))
+  (subpath (string-append (param "HOME") "/Library/Caches"))
+  (subpath (string-append (param "HOME") "/.npm"))
+  (subpath (string-append (param "HOME") "/.cache")))

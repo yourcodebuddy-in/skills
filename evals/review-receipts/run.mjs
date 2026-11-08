@@ -14,7 +14,7 @@
 
 import { spawn, spawnSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -22,7 +22,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../..");
 const WORKSPACE = join(ROOT, "workspace/review-receipts");
 const REAL_SUITE = join(WORKSPACE, "cache/real-prs.json");
-const FRESH_SUITE = join(WORKSPACE, "cache/fresh-prs.json");
+const FRESH_SUITES = { fresh: join(WORKSPACE, "cache/fresh-prs.json"), fresh2: join(WORKSPACE, "cache/fresh-prs-2.json") };
 const PUBLISHED_REVIEWS = join(WORKSPACE, "cache/martian/results/benchmark_data.json");
 const SNAPSHOTS = join(WORKSPACE, "cache/snapshots");
 
@@ -67,8 +67,12 @@ function parseArgs(argv) {
   return out;
 }
 
+// Agents and fixture code run under sandbox.sb, which denies writes outside temp folders,
+// Claude's own state and caches. Without it, an agent testing a fixture deleted most of ~/Desktop.
+const SANDBOX = ["-f", join(HERE, "sandbox.sb"), "-D", `HOME=${homedir()}`];
+
 function sh(command, cwd, env = {}) {
-  return spawnSync("sh", ["-c", command], { cwd, env: { ...process.env, ...env }, encoding: "utf8" });
+  return spawnSync("sandbox-exec", [...SANDBOX, "sh", "-c", command], { cwd, env: { ...process.env, ...env }, encoding: "utf8" });
 }
 
 function git(cwd, ...args) {
@@ -126,7 +130,7 @@ function proofs() {
 
 function runClaude(args, cwd, transcriptPath) {
   return new Promise((done) => {
-    const child = spawn("claude", args, { cwd, stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn("sandbox-exec", [...SANDBOX, "claude", ...args], { cwd, stdio: ["ignore", "pipe", "pipe"] });
     let stdout = "";
     let stderr = "";
     child.stdout.on("data", (chunk) => { stdout += chunk; });
@@ -431,7 +435,11 @@ ${review}
   }
   let parsed;
   try { parsed = JSON.parse(stdout); } catch { throw new Error(`validity output for ${runDir}: ${stderr || stdout.slice(0, 300)} (exit ${code})`); }
-  if (!parsed.structured_output) throw new Error(`no structured validity output for ${runDir}: ${stdout.slice(0, 300)}`);
+  // A judge refusal leaves this run unchecked, and the report counts only the runs that have validity.json.
+  if (!parsed.structured_output) {
+    console.error(`not validated ${runDir.split("/").slice(-3).join("/")}: stop_reason=${parsed.stop_reason} ${String(parsed.result ?? "").slice(0, 200)}`);
+    return;
+  }
   writeFileSync(out, `${JSON.stringify({ ...parsed.structured_output, judge_cost_usd: parsed.total_cost_usd }, null, 2)}\n`);
   console.log(`validated ${runDir.split("/").slice(-3).join("/")}`);
 }
@@ -858,15 +866,15 @@ async function triggers(opts) {
 
 const [command, ...rest] = process.argv.slice(2);
 const options = parseArgs(rest);
-// Suites: fixtures by default, or real PRs with --suite dev (15 PRs), holdout (the other 35), all, or fresh.
-if (options.suite && !existsSync(options.suite === "fresh" ? FRESH_SUITE : REAL_SUITE)) {
+// Suites: fixtures by default, or real PRs with --suite dev (15 PRs), holdout (the other 35), all, fresh, or fresh2.
+if (options.suite && !existsSync(FRESH_SUITES[options.suite] ?? REAL_SUITE)) {
   console.error("The real-PR data isn't downloaded yet. Run: node evals/review-receipts/prepare-real-prs.mjs download");
   process.exit(2);
 }
 const EVALS = !options.suite
   ? JSON.parse(readFileSync(join(HERE, "evals.json"), "utf8")).evals
-  : options.suite === "fresh"
-    ? JSON.parse(readFileSync(FRESH_SUITE, "utf8"))
+  : FRESH_SUITES[options.suite]
+    ? JSON.parse(readFileSync(FRESH_SUITES[options.suite], "utf8"))
     : JSON.parse(readFileSync(REAL_SUITE, "utf8")).filter((p) => options.suite === "all" || p.dev === (options.suite === "dev"));
 const iterationDir = options.iteration ? join(WORKSPACE, `iteration-${options.iteration}`) : null;
 const pick = options.cases ? EVALS.filter((e) => options.cases.split(",").includes(e.id)) : EVALS;
