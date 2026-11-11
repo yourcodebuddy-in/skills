@@ -1,10 +1,36 @@
-# Results for version 1.0.0
+# Results for versions 1.0.0 and 1.1.0
 
-Measured on 2026-11-06 and 2026-11-07 in Claude Code. Raw output is in `workspace/review-receipts/`, which is git-ignored. [docs/BENCHMARKING.md](../../docs/BENCHMARKING.md) explains the method and how to repeat it.
+Measured on 2026-11-06 and 2026-11-07 in Claude Code, with 1.1.0 and an independent judge added on 2026-11-08, and Opus as the reviewer on 2026-11-10. Raw output is in `workspace/review-receipts/`, which is git-ignored. [docs/BENCHMARKING.md](../../docs/BENCHMARKING.md) explains the method and how to repeat it.
 
 **Read this with the [fresh test](FRESH-TEST-RESULTS.md),** run later on 35 PRs from other projects. It found much higher false-alarm rates than the tables below, and is likely closer to what you'll see on your own code. Version 1.1.0 was compared with 1.0.0 in [a second fresh test](FRESH-TEST-2-RESULTS.md).
 
 **What was measured:** pre-release builds named `evidence-review`. After the last real-PR and fixture runs, unused instructions for verifier subagents were removed, the skill was renamed `review-receipts`, and its description was reworded. None of this touched the rest of the instructions. The real-PR scores weren't rerun. The fixtures were rerun after the removal, and the trigger test after the rename and the new description.
+
+## Rerun with 1.1.0 and an independent judge
+
+Run on 2026-11-08. Version 1.1.0 reviewed the same 35 PRs as the table below, one run per PR, on Sonnet and on Haiku. Then every review, the published tools' included, was graded again by Claude Opus 5.5, which wrote none of them. Opus as the reviewer was added later, so for those two rows the judge graded its own model's reviews. On the development PRs, this Opus judge came within 2 to 6 points of Martian's published Opus scores, as described below. These PRs have now been used three times, so treat this as a check, not an unseen test.
+
+| Reviewer, graded by Opus | Precision | Recall | F1 |
+| --- | --- | --- | --- |
+| Qodo Extended | 61.9 | 60.9 | 61.4 |
+| Cubic | 62.2 | 60.0 | 61.1 |
+| Augment | 54.6 | 61.7 | 58.0 |
+| Bugbot | 60.0 | 47.0 | 52.7 |
+| Sonnet + 1.0.0 | 41.6 | 58.3 | 48.6 |
+| Sonnet + 1.1.0 | 47.8 | 47.8 | 47.8 |
+| Opus + 1.1.0 | 41.5 | 53.0 | 46.6 |
+| Opus, no skill | 30.2 | 79.1 | 43.8 |
+| Haiku + 1.1.0 | 36.8 | 49.6 | 42.2 |
+| Haiku + 1.0.0 | 29.2 | 69.6 | 41.1 |
+| Sonnet, no skill | 28.7 | 67.0 | 40.2 |
+
+- **The Sonnet judge favored Sonnet's reviews.** Switching to Opus lowered the published tools by 0 to 2 points, but Sonnet with 1.0.0 by 6.4 and Sonnet with no skill by 7.1. So the gap to the top tool is about 13 points, not the 7 in the table below.
+- **1.1.0 and 1.0.0 are level on F1.** 1.1.0 is more precise and finds less, on both models.
+- **The skill still helps.** Sonnet with either version scores about 8 points above Sonnet alone.
+- **A stronger model doesn't close the gap.** Opus with 1.1.0 scored 46.6, below Sonnet with 1.1.0, and only 2.8 points above Opus alone. Opus alone found 91 of the 115 known issues, more than any published tool (Qodo Extended found 70), but reported 8.8 issues per PR with precision 30.2. The skill's filtering cut that to 61 found at precision 41.5, so it dropped real issues nearly as readily as false ones. The judge may favor Opus's reviews, as Sonnet favored Sonnet's, which would make these two rows too high, not too low.
+- **The Sonnet judge used below** scored 1.1.0 at F1 49.8 on Sonnet and 44.8 on Haiku, against 55.0 and 51.5 for 1.0.0. That judge's preference for Sonnet's own reviews may affect versions differently, so the Opus table is the fairer comparison.
+
+1.1.0 took 242 s and $0.34 per PR on Sonnet, 245 s and $0.10 on Haiku, and 301 s and $1.00 on Opus. Opus alone took 58 s and $0.32. Four Opus runs with 1.1.0 passed the runner's 15-minute limit and were rerun with a 40-minute limit, finishing in 3 to 8 minutes. This is one run per PR. Grading identical reviews twice has moved F1 by up to 3.4 points, and identical runs differ by more.
 
 ## Real pull requests
 
@@ -29,7 +55,7 @@ Measured on 2026-11-06 and 2026-11-07 in Claude Code. Raw output is in `workspac
 
 We checked the judge against published scores on the 15 development PRs first. It came within 2 points on two tools and within 6 on the other three (Claude Opus 5.5 as judge, against Martian's published Opus scores): Qodo Extended 68.4 vs. 69.1, Augment 65.1 vs. 63.5, Cubic 66.7 vs. 61.2, CodeRabbit 43.7 vs. 49.1, and the Claude Code CLI 41.0 vs. 47.1. This table uses Claude Sonnet 5.5 as judge, which scored 3 to 7 points higher than Opus on the two tools we compared directly. Compare within this table only, not with the published leaderboard. Sonnet also graded the Sonnet reviews, so that judge wasn't independent of the reviewer.
 
-**These 35 PRs have been used twice.** An earlier version scored Sonnet 57.0 and Haiku 45.9 on them. Reading those runs showed models often skipped the hunting passes, so the skill was changed to stop that, and the PRs were rerun. No finding or answer was tuned against, but this set is no longer fully unseen. Haiku then scored higher and Sonnet about the same, with one run each, so this doesn't show the change caused either result.
+**These 35 PRs had been used twice by the time of this table.** An earlier version scored Sonnet 57.0 and Haiku 45.9 on them. Reading those runs showed models often skipped the hunting passes, so the skill was changed to stop that, and the PRs were rerun. No finding or answer was tuned against, but this set is no longer fully unseen. Haiku then scored higher and Sonnet about the same, with one run each, so this doesn't show the change caused either result.
 
 ## Are the unmatched findings actually wrong?
 

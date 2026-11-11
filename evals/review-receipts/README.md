@@ -21,7 +21,7 @@ node evals/review-receipts/run.mjs trigger --model claude-haiku-5-5             
 
 Results go to `workspace/review-receipts/iteration-N/`, which is git-ignored.
 
-Options: `--cases a,b`, `--repeat N`, `--jobs N`, `--model <id>`, `--judge-model <id>`.
+Options: `--cases a,b`, `--repeat N`, `--jobs N`, `--model <id>`, `--judge-model <id>`. Each agent run stops after 15 minutes. Set `RUN_TIMEOUT_MIN` to change that, and say so when reporting the result.
 
 **These commands use your account's usage.** A full comparison across both suites is large enough to reach a usage limit. The runner stops at the first sign of one, and rerunning the same command resumes it. Start with `--cases` and one model.
 
@@ -53,6 +53,8 @@ node evals/review-receipts/run.mjs run --suite fresh --iteration fresh --configs
 
 `--set 2` on every step except `search` draws a second sample from the same search, leaving out the repositories in the first, and `--suite fresh2` runs it. Both samples are now used.
 
+The answer-key judge sees the reviewed diff as well as the later commits, and counts only defects in reviewed code. Keys built before 2026-11-08 didn't see the diff, so they also counted fixes to code added after the first review. `key --key-dir <name>` builds a separate key without touching the original. `--set 2 --key-dir keys-v2` rebuilt the second sample's key, and `--suite fresh2-v2` grades against it.
+
 ## Analyses
 
 ```sh
@@ -70,6 +72,7 @@ node evals/review-receipts/run.mjs agreement --suite dev --iteration 1 --configs
 | `no_skill` | All skills and slash commands disabled |
 | `old_skill` | `baselines/v0/code-review`, an unchanged copy of the original skill |
 | `prev_skill` | The previous release. Extract it first with `mkdir -p workspace/review-receipts/baselines/v1.0 && git archive review-receipts-v1.0.0 skills/review-receipts \| tar -x -C workspace/review-receipts/baselines/v1.0` |
+| `v1_1_skill` | Release 1.1.0. Extract it first with `mkdir -p workspace/review-receipts/baselines/v1.1 && git archive review-receipts-v1.1.0 skills/review-receipts \| tar -x -C workspace/review-receipts/baselines/v1.1` |
 | `with_skill` | `skills/review-receipts`, the working version |
 | `*_forced` | The same skill, with the prompt also naming it. Tests the instructions alone, whereas the plain config also tests whether the description fires |
 

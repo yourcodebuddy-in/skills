@@ -10,7 +10,7 @@ Each skill has its own version, set in its `SKILL.md`.
 - Reports keep at most one question, list a pre-existing bug only if it would be a Must fix were it new, and count minor points without describing them.
 - The description says what the skill does rather than promising results.
 
-On 35 fresh PRs against 1.0.0, Claude Opus judged 3% of Sonnet's findings false alarms, down from 13%, and 16% of Haiku's, down from 17%. Haiku reported half as many findings but found 19 of 88 known defects, against 30. See [the results](evals/review-receipts/FRESH-TEST-2-RESULTS.md).
+On 35 fresh PRs against 1.0.0, Claude Opus judged 3% of Sonnet's findings false alarms, down from 13%, and 16% of Haiku's, down from 17%. Haiku reported half as many findings but found 19 of 88 known defects, against 30. A corrected answer key later gave 20 of 68 against 32 on Haiku, and about the same number for both versions on Sonnet. See [the results](evals/review-receipts/FRESH-TEST-2-RESULTS.md).
 
 ## review-receipts 1.0.0
 

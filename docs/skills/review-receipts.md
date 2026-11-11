@@ -57,6 +57,21 @@ Version 1.0.0 was measured on 35 real pull requests kept out of development, tho
 | Claude Code (CLI, as Martian names it) | 41.7 | 45.5 | |
 | Haiku, no skill | 67.8 | 40.2 | $0.01 |
 
+That judge was Claude Sonnet, which also wrote the Sonnet reviews and favored them. Regraded by Claude Opus, which wrote none of them, the gap is wider:
+
+| On the same 35 PRs, graded by Opus | Precision | Recall | F1 |
+| --- | --- | --- | --- |
+| Qodo Extended | 61.9 | 60.9 | 61.4 |
+| Cubic | 62.2 | 60.0 | 61.1 |
+| Sonnet + 1.0.0 | 41.6 | 58.3 | 48.6 |
+| Sonnet + 1.1.0 | 47.8 | 47.8 | 47.8 |
+| Opus + 1.1.0 | 41.5 | 53.0 | 46.6 |
+| Opus, no skill | 30.2 | 79.1 | 43.8 |
+| Haiku + 1.1.0 | 36.8 | 49.6 | 42.2 |
+| Sonnet, no skill | 28.7 | 67.0 | 40.2 |
+
+The skill adds about 8 points to Sonnet, and 1.1.0 trades recall for precision with about the same F1 as 1.0.0. Both trail the leaders by about 13 points. Opus doesn't close the gap: alone it found more known issues than any tool but with many false positives, and the skill's filtering removed real issues nearly as often as false ones. Opus graded its own model's reviews in those rows, which may favor them.
+
 F1 counts anything missing from the benchmark's list of known issues as wrong, but that list is incomplete. Checked against the real code by a stronger model, the same reviews compare like this:
 
 | | Real issues found | False alarms | Invented |
@@ -72,12 +87,12 @@ Only Qodo Extended got this deeper check among the published tools, and Qodo's f
 
 | On 35 fresh PRs | Findings | Real issues | False alarms | Invented | Known defects found |
 | --- | --- | --- | --- | --- | --- |
-| Sonnet + 1.0.0 | 46 | 32 | 6 (13%) | 2 | 19 of 88 |
-| Sonnet + 1.1.0 | 39 | 33 | 1 (3%) | 0 | 23 of 88 |
-| Haiku + 1.0.0 | 133 | 50 | 22 (17%) | 6 | 30 of 88 |
-| Haiku + 1.1.0 | 69 | 38 | 11 (16%) | 3 | 19 of 88 |
+| Sonnet + 1.0.0 | 46 | 32 | 6 (13%) | 2 | 22 to 25 of 68 |
+| Sonnet + 1.1.0 | 39 | 33 | 1 (3%) | 0 | 22 to 23 of 68 |
+| Haiku + 1.0.0 | 133 | 50 | 22 (17%) | 6 | 32 of 68 |
+| Haiku + 1.1.0 | 69 | 38 | 11 (16%) | 3 | 20 of 68 |
 
-On Haiku, 1.1.0 trades recall for fewer findings. On the small test changes, Sonnet with 1.1.0 found 32 of 33 planted problems and gave the right merge advice on 26 of 31, against 33 and 31 for 1.0.0, in one run each. See [the second fresh test results](../../evals/review-receipts/FRESH-TEST-2-RESULTS.md).
+Known defects are counted against an answer key corrected after the test, since the first one also counted fixes to code added after the review. Ranges show where two gradings of the same reviews differed. On Sonnet, 1.1.0's gain is fewer false alarms, not more defects found. On Haiku, 1.1.0 trades recall for fewer findings. On the small test changes, Sonnet with 1.1.0 found 32 of 33 planted problems and gave the right merge advice on 26 of 31, against 33 and 31 for 1.0.0, in one run each. See [the second fresh test results](../../evals/review-receipts/FRESH-TEST-2-RESULTS.md).
 
 ## Choosing a model
 

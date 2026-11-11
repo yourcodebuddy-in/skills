@@ -4,6 +4,8 @@ Run on 2026-11-08 under [FRESH-TEST-2-PLAN.md](FRESH-TEST-2-PLAN.md), including 
 
 **Decision: the new version replaces 1.0.0.** It passed all three rules on both models. On Haiku the real-issue rule passed narrowly, and Haiku found fewer of the known defects, as shown below.
 
+**Corrected later the same day:** the answer key counted defects in code added after the review. Against a corrected key, the new version didn't find more known defects than 1.0.0 on Sonnet. See [the correction](#correction-to-the-answer-key).
+
 ## The rules
 
 Every finding outside the answer key was checked against the code by Claude Opus 5.5.
@@ -40,7 +42,22 @@ Rows don't sum to the total, because findings judged out of scope or unverifiabl
 | Haiku, 1.0.0 | 22.6 | 34.1 | 27.1 | 3.8 | 194 s | $0.06 |
 | Haiku, new | 27.5 | 21.6 | 24.2 | 1.9 | 215 s | $0.06 |
 
-**On Haiku, the new version found 19 of the known defects, against 30 for 1.0.0.** It reports half as many findings, with far fewer nits, but that also cost real ones. On Sonnet it found more and was wrong less. This answer key holds only what developers went on to fix, so recall here misses real issues nobody fixed.
+**On Haiku, the new version found 19 of the known defects, against 30 for 1.0.0.** It reports half as many findings, with far fewer nits, but that also cost real ones. On Sonnet it was wrong less, and against this key it also found more, which the corrected key below doesn't support. This answer key holds only what developers went on to fix, so recall here misses real issues nobody fixed.
+
+## Correction to the answer key
+
+The key above was built from the commits made after the first review, without the diff that was reviewed. So it also counted fixes to code that was added after the review. `greenshot/greenshot` #1122 had 15 known defects, while its reviewed change was 16 lines in 2 files that contained none of them.
+
+The key was rebuilt with the reviewed diff in the prompt, counting a defect only if it was already in the reviewed version, including a file the change left stale. That gave 68 known defects instead of 88. The judge refused one PR again, `YuKongA/ghostlock-app` #333, which keeps its old key of 2. The same reviews were then graded twice against it by Claude Sonnet 5.5, to show how much the judge itself varies:
+
+| | Precision | Recall | F1 | Known defects found |
+| --- | --- | --- | --- | --- |
+| Sonnet, 1.0.0 | 47.8 to 49.0 | 32.4 to 36.8 | 38.6 to 42.0 | 22 to 25 of 68 |
+| Sonnet, new | 51.1 to 51.2 | 32.4 to 33.8 | 39.6 to 40.7 | 22 to 23 of 68 |
+| Haiku, 1.0.0 | 23.0 | 47.1 | 30.9 | 32 of 68 |
+| Haiku, new | 27.0 to 27.4 | 29.4 | 28.2 to 28.4 | 20 of 68 |
+
+On Sonnet, the two versions are level on known defects and F1, so the gain is fewer false alarms, not more found. On Haiku, the drop in known defects found holds. The three rules above used Opus's check of the findings outside the old key, which wasn't rerun against the new one. The original key and grades are kept, and the regrades are in `iteration-fresh2b-*-v3a` and `-v3b`.
 
 ## Fixture check
 

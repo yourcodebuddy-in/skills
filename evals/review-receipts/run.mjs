@@ -22,7 +22,15 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../..");
 const WORKSPACE = join(ROOT, "workspace/review-receipts");
 const REAL_SUITE = join(WORKSPACE, "cache/real-prs.json");
-const FRESH_SUITES = { fresh: join(WORKSPACE, "cache/fresh-prs.json"), fresh2: join(WORKSPACE, "cache/fresh-prs-2.json") };
+const FRESH_SUITES = {
+  fresh: join(WORKSPACE, "cache/fresh-prs.json"),
+  fresh2: join(WORKSPACE, "cache/fresh-prs-2.json"),
+  // The second sample with its answer key rebuilt from the reviewed diff, by `prepare-fresh-prs.mjs key --set 2 --key-dir keys-v3`.
+  // keys-v2 was a first attempt that also left out defects the diff caused by not changing another file.
+  "fresh2-v2": join(WORKSPACE, "cache/fresh-prs-2-keys-v2.json"),
+  "fresh2-v3": join(WORKSPACE, "cache/fresh-prs-2-keys-v3.json"),
+  "fresh-v3": join(WORKSPACE, "cache/fresh-prs-keys-v3.json"),
+};
 const PUBLISHED_REVIEWS = join(WORKSPACE, "cache/martian/results/benchmark_data.json");
 const SNAPSHOTS = join(WORKSPACE, "cache/snapshots");
 
@@ -32,6 +40,7 @@ const CONFIGS = {
   old_skill_forced: { name: "code-review", path: join(HERE, "baselines/v0/code-review"), force: true },
   // The release this version is measured against, extracted from its git tag into workspace/.
   prev_skill: { name: "review-receipts", path: join(WORKSPACE, "baselines/v1.0/skills/review-receipts") },
+  v1_1_skill: { name: "review-receipts", path: join(WORKSPACE, "baselines/v1.1/skills/review-receipts") },
   with_skill: { name: "review-receipts", path: join(ROOT, "skills/review-receipts") },
   with_skill_forced: { name: "review-receipts", path: join(ROOT, "skills/review-receipts"), force: true },
   with_skill_solo: { name: "review-receipts", path: join(ROOT, "skills/review-receipts"), force: true, noAgents: true },
@@ -43,7 +52,8 @@ const BLOCKED_TOOLS = [
   "PushNotification", "DesignSync", "SendToProject", "SendToProjectContext", "Workflow",
 ];
 
-const RUN_TIMEOUT_MS = 15 * 60_000;
+// Slower models can need longer. Set RUN_TIMEOUT_MIN, and say so when reporting the result.
+const RUN_TIMEOUT_MS = Number(process.env.RUN_TIMEOUT_MIN ?? 15) * 60_000;
 
 // These runs draw on the same usage limit as everything else on the account, so stop at the
 // first sign of it rather than recording failures. Finished work is kept, so a rerun resumes.
@@ -554,7 +564,11 @@ function readWorkflow(runDir) {
       }
     }
   }
-  workflow.candidates = (workflow.notes ?? "").split("\n").filter((row) => /^C\d+\s+\S+:\d+/.test(row));
+  const noteRows = (workflow.notes ?? "").split("\n");
+  workflow.candidates = noteRows.filter((row) => /^C\d+\s+\S+:\d+/.test(row));
+  // Candidates verification kept. Anything here but missing from the report was rated Minor, refuted, or left out.
+  const keptIds = new Set(noteRows.map((row) => row.match(/^(C\d+)\s+(?:Confirmed|Likely|Fragile|Question)\b/)?.[1]).filter(Boolean));
+  workflow.kept = workflow.candidates.filter((row) => keptIds.has(row.split(/\s/)[0]));
   workflow.passed = /PASS:/.test(workflow.checks.at(-1) ?? "");
   workflow.passes = (workflow.notes ?? "").match(/^PASSES \d+ \w+/m)?.[0] ?? "none";
   return workflow;
@@ -621,9 +635,10 @@ function funnel(iterationDir, configs) {
   let written = 0;
   for (const { evalCase, config, run, runDir } of listRuns(iterationDir)) {
     if (!pick.includes(evalCase) || !configs.includes(config)) continue;
-    const { suspects, candidates } = readWorkflow(runDir);
+    const { suspects, candidates, kept } = readWorkflow(runDir);
     if (suspects.length) writeStubRun(join(out, `eval-${evalCase.id}`, `${config}-hunters`, run), suspects.join("\n"));
     if (candidates.length) writeStubRun(join(out, `eval-${evalCase.id}`, `${config}-merged`, run), candidates.join("\n"));
+    if (kept.length) writeStubRun(join(out, `eval-${evalCase.id}`, `${config}-kept`, run), kept.join("\n"));
     written += 1;
   }
   console.log(`wrote the stages of ${written} runs to ${out}. Next: grade and report --iteration <same>-funnel, then compare with the report's own score.`);

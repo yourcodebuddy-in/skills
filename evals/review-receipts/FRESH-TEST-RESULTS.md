@@ -4,6 +4,8 @@ Run on 2026-11-07 under [FRESH-TEST-PLAN.md](FRESH-TEST-PLAN.md), which set the 
 
 **Decision: the candidate does not replace 1.0.0.** It failed two of the three rules on both models.
 
+**Corrected on 2026-11-08:** the answer key counted defects in code added after the review. The overall scores and the bot table are recomputed against a corrected key in [the correction](#correction-to-the-answer-key). The decision rested on the false-finding check, which the key barely affects.
+
 ## The rules
 
 Every finding outside the answer key was checked against the code by Claude Opus 5.5.
@@ -63,6 +65,33 @@ With this few PRs per bot and this bias, the table doesn't rank anyone. False fi
 ## Workflow
 
 The candidate ran the hunting passes on 32 of 35 PRs on Sonnet and 31 of 35 on Haiku, and reached the checker's PASS on 31 and 28 of 35. No review changed the code. Eight runs were flagged as changing a repo, but the untracked files were the skill copy our test harness had installed.
+
+## Correction to the answer key
+
+The key was built from the commits made after the first review, without the diff that was reviewed, so it also counted fixes to code added after the review. It was rebuilt with the reviewed diff in the prompt, counting a defect only if it was already in the reviewed version, including a file the change left stale. That gave 64 known defects in the scoring categories instead of 69. The same reviews were graded once against it by Claude Sonnet 5.5. Grading identical reviews twice on the second sample moved F1 by up to 3.4 points, so treat smaller gaps as noise.
+
+| | Precision | Recall | F1 |
+| --- | --- | --- | --- |
+| Sonnet, no skill | 24.0 | 37.5 | 29.3 |
+| Sonnet, 1.0.0 | 34.6 | 28.1 | 31.0 |
+| Sonnet, candidate | 38.6 | 34.4 | 36.4 |
+| Haiku, no skill | 13.7 | 32.8 | 19.4 |
+| Haiku, 1.0.0 | 22.7 | 46.9 | 30.6 |
+| Haiku, candidate | 29.4 | 46.9 | 36.1 |
+
+Against the corrected key, 1.0.0's lead over no skill on Sonnet, 31.0 against 29.3, is within the judge's own variation. On Haiku it holds. The bot table, recomputed the same way:
+
+| Bot | PRs | Known defects | Bot F1 | Sonnet + candidate F1 | Haiku + candidate F1 |
+| --- | --- | --- | --- | --- | --- |
+| CodeRabbit | 12 | 31 | 46.7 | 40.0 | 39.5 |
+| Greptile | 9 | 21 | 62.5 | 32.3 | 43.2 |
+| Copilot | 8 | 10 | 19.0 | 20.0 | 34.3 |
+| cubic | 5 | 10 | 33.3 | 35.3 | 25.0 |
+| Cursor | 5 | 3 | 25.0 | 0.0 | 28.6 |
+| Gemini | 3 | 6 | 40.0 | 20.0 | 30.8 |
+| Claude | 3 | 7 | 58.8 | 18.2 | 44.4 |
+
+The original key and grades are kept, and the regrades are in `iteration-fresh-*-v3`.
 
 ## Limits
 
