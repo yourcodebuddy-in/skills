@@ -1,0 +1,31 @@
+{
+  "starter": {
+    "name": "Starter",
+    "currency": "GBP",
+    "base_cents": 2900,
+    "metrics": {
+      "api_calls": {"label": "API calls", "unit_cents": "0.05", "included": "10000"},
+      "storage_gb": {"label": "Storage (GB-days)", "unit_cents": "1.5"}
+    }
+  },
+  "growth": {
+    "name": "Growth",
+    "currency": "GBP",
+    "base_cents": 9900,
+    "metrics": {
+      "api_calls": {"label": "API calls", "unit_cents": "0.03", "included": "100000"},
+      "storage_gb": {"label": "Storage (GB-days)", "unit_cents": "1.2", "included": "300"},
+      "seats": {"label": "Extra seats", "unit_cents": "800", "included": "5"}
+    }
+  },
+  "enterprise": {
+    "name": "Enterprise",
+    "currency": "GBP",
+    "base_cents": 49900,
+    "metrics": {
+      "api_calls": {"label": "API calls", "unit_cents": "0.02", "included": "1000000"},
+      "storage_gb": {"label": "Storage (GB-days)", "unit_cents": "0.9", "included": "3000"},
+      "seats": {"label": "Extra seats", "unit_cents": "600", "included": "25"}
+    }
+  }
+}

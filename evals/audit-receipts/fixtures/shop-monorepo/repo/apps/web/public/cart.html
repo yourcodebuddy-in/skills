@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Your cart · Kettle &amp; Cup</title>
+    <link rel="stylesheet" href="/css/site.css">
+    <script type="module" src="/js/cart.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to your cart</a>
+    <header class="site-header">
+      <a class="brand" href="/">Kettle &amp; Cup</a>
+      <nav aria-label="Main">
+        <a href="/account" data-nav-account>Sign in</a>
+        <a href="/cart" aria-current="page">Cart <span class="badge" data-cart-count hidden>0</span></a>
+      </nav>
+    </header>
+    <main id="main" class="narrow">
+      <h1>Your cart</h1>
+      <p class="status-line" data-status role="status" aria-live="polite"></p>
+      <ul class="cart-lines" data-lines></ul>
+      <div data-summary></div>
+      <a class="button button-primary" href="/checkout" data-checkout hidden>Go to checkout</a>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "@kettle/web",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "description": "Storefront and admin pages, served as static files by @kettle/api.",
+  "scripts": {
+    "test": "node --test"
+  }
+}

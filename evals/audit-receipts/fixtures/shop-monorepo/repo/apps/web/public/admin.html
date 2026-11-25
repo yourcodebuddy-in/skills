@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin · Kettle &amp; Cup</title>
+    <link rel="stylesheet" href="/css/site.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <script type="module" src="/js/admin.js"></script>
+  </head>
+  <body class="admin">
+    <header class="site-header">
+      <a class="brand" href="/admin">Kettle &amp; Cup admin</a>
+      <nav aria-label="Main">
+        <a href="/">Shop</a>
+        <a href="/account" data-nav-account>Sign in</a>
+        <span class="badge" data-cart-count hidden>0</span>
+      </nav>
+    </header>
+    <main id="main">
+      <div class="tabs" role="tablist" aria-label="Admin sections">
+        <button type="button" role="tab" data-tab="orders" aria-selected="true">Orders</button>
+        <button type="button" role="tab" data-tab="products" aria-selected="false">Products</button>
+        <button type="button" role="tab" data-tab="coupons" aria-selected="false">Discount codes</button>
+        <button type="button" role="tab" data-tab="sales" aria-selected="false">Sales</button>
+      </div>
+      <p class="status-line" data-status role="status" aria-live="polite"></p>
+
+      <section data-panel="orders" role="tabpanel" aria-label="Orders">
+        <label for="status-filter">Show</label>
+        <select id="status-filter" data-status-filter>
+          <option value="">All orders</option>
+          <option value="paid">Paid, to ship</option>
+          <option value="pending_payment">Awaiting payment</option>
+          <option value="fulfilled">Shipped</option>
+          <option value="refunded">Refunded</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <table class="table">
+          <thead>
+            <tr><th>Order</th><th>Placed</th><th>Customer</th><th class="numeric">Items</th><th class="numeric">Total</th><th>Status</th></tr>
+          </thead>
+          <tbody data-order-rows></tbody>
+        </table>
+        <article class="detail" data-order-detail hidden></article>
+      </section>
+
+      <section data-panel="products" role="tabpanel" aria-label="Products" hidden>
+        <button type="button" class="button" data-new-product>Add a product</button>
+        <table class="table">
+          <thead>
+            <tr><th>SKU</th><th>Name</th><th class="numeric">Price</th><th class="numeric">Stock</th><th>Shop</th><th><span class="visually-hidden">Actions</span></th></tr>
+          </thead>
+          <tbody data-product-rows></tbody>
+        </table>
+        <form class="stack panel-form" data-product-form hidden>
+          <label for="product-sku">SKU</label>
+          <input id="product-sku" name="sku" required maxlength="32">
+          <label for="product-name">Name</label>
+          <input id="product-name" name="name" required maxlength="120">
+          <label for="product-description">Description</label>
+          <textarea id="product-description" name="description" rows="3" maxlength="2000"></textarea>
+          <label for="product-price">Price ($)</label>
+          <input id="product-price" name="price" inputmode="decimal" required>
+          <label for="product-stock">Stock</label>
+          <input id="product-stock" name="stock" type="number" min="0" step="1" required>
+          <label class="checkbox"><input name="active" type="checkbox"> Listed in the shop</label>
+          <button type="submit" class="button button-primary">Save product</button>
+        </form>
+      </section>
+
+      <section data-panel="coupons" role="tabpanel" aria-label="Discount codes" hidden>
+        <table class="table">
+          <thead>
+            <tr><th>Code</th><th>Value</th><th class="numeric">Minimum spend</th><th class="numeric">Uses</th><th>Last day</th></tr>
+          </thead>
+          <tbody data-coupon-rows></tbody>
+        </table>
+        <form class="stack panel-form" data-coupon-form>
+          <h2>New code</h2>
+          <label for="coupon-code">Code</label>
+          <input id="coupon-code" name="code" required maxlength="20">
+          <fieldset>
+            <legend>Discount</legend>
+            <label class="checkbox"><input type="radio" name="kind" value="percent" checked> Percent off</label>
+            <label class="checkbox"><input type="radio" name="kind" value="amount"> Dollars off</label>
+          </fieldset>
+          <label for="coupon-value">Amount</label>
+          <input id="coupon-value" name="value" inputmode="decimal" required>
+          <label for="coupon-minimum">Minimum spend ($, optional)</label>
+          <input id="coupon-minimum" name="minimum" inputmode="decimal">
+          <label for="coupon-limit">Maximum uses (optional)</label>
+          <input id="coupon-limit" name="limit" type="number" min="1" step="1">
+          <label for="coupon-expires">Last day it works (optional)</label>
+          <input id="coupon-expires" name="expiresOn" type="date">
+          <button type="submit" class="button button-primary">Create code</button>
+        </form>
+      </section>
+
+      <section data-panel="sales" role="tabpanel" aria-label="Sales" hidden>
+        <form class="inline-form" data-report-form>
+          <label for="report-from">From</label>
+          <input id="report-from" name="from" type="date" required>
+          <label for="report-to">To</label>
+          <input id="report-to" name="to" type="date" required>
+          <button type="submit" class="button">Show takings</button>
+        </form>
+        <div data-report></div>
+      </section>
+    </main>
+  </body>
+</html>

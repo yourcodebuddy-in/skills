@@ -1,0 +1,43 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Compile
+        run: python -m compileall -q clinicbook tests
+      - name: Tests
+        run: python -m unittest discover -s tests -v
+      - name: Migrations apply to an empty database
+        run: python -m clinicbook migrate
+        env:
+          CLINICBOOK_DB: ${{ runner.temp }}/ci.sqlite3
+
+  image:
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: docker build --tag clinicbook:ci .
+      - name: Smoke test
+        run: |
+          docker run --rm clinicbook:ci migrate
+          docker run --rm clinicbook:ci --help

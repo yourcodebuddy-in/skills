@@ -1,0 +1,15 @@
+{
+  "name": "tenant-notes",
+  "version": "0.6.0",
+  "private": true,
+  "description": "Notes for small teams: shared notes with tags, share links, a daily digest and CSV export.",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/server.js",
+    "digest": "node --env-file-if-exists=.env scripts/queue-digests.js",
+    "test": "node --test"
+  }
+}

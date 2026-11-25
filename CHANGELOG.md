@@ -2,6 +2,10 @@
 
 Each skill has its own version, set in its `SKILL.md`.
 
+## audit-receipts 0.1.0
+
+First release. See [its page](docs/skills/audit-receipts.md) for how it works and how it scored, and [the results](evals/audit-receipts/RESULTS.md) for what it wasn't tested on.
+
 ## review-receipts 1.1.0
 
 - Code from the change runs only in a throwaway copy inside a temp directory, with `HOME` and every path it uses pointed there. Anything that deletes or moves files and can't be confined that way is traced instead of run.

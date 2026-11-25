@@ -7,6 +7,7 @@ Agent skills built to work on any project and measured before release. Each one 
 | Skill | What it does | Details |
 | --- | --- | --- |
 | [review-receipts](skills/review-receipts/SKILL.md) | Reviews code and checks each finding against the code before reporting it, with a severity based on what would actually go wrong | [Docs and results](docs/skills/review-receipts.md) |
+| [audit-receipts](skills/audit-receipts/SKILL.md) | Audits a whole codebase, reading every file, checks each finding against the code, and scores each area with the reasons behind every point lost | [Docs and results](docs/skills/audit-receipts.md) |
 
 ### How review-receipts was tested
 
@@ -24,6 +25,20 @@ Of the 8 published tools we scored with the same judge, the top one scored 61.9,
 **A later test found more false alarms.** On 35 newer PRs from 35 other projects, with one run per PR, 1.0.0 scored higher than no skill on Haiku (F1 30.6 vs. 19.4), and about the same on Sonnet (31.0 vs. 29.3, within the judge's own variation). These use an answer key corrected after the test, because the first one also counted fixes to code added after the review. But Claude Opus judged 18% of its Sonnet findings and 15% of its Haiku findings to be false alarms, well above the 6% measured on Sonnet in the table's test. Expect the higher figure on your own code. [Fresh test results](evals/review-receipts/FRESH-TEST-RESULTS.md).
 
 **Version 1.1.0 was compared with 1.0.0 on another 35 fresh PRs,** under rules written in advance, and passed on both models. Opus judged 3% of the Sonnet findings to be false alarms, against 13% for 1.0.0. On Haiku it was 16% against 17%, but Haiku also found fewer of the known defects, 20 of 68 against 32 on the corrected key. On Sonnet both versions found about the same number, 22 to 25 of 68. On the benchmark above, 1.1.0 and 1.0.0 scored about the same. [Second fresh test results](evals/review-receipts/FRESH-TEST-2-RESULTS.md).
+
+### How audit-receipts was tested
+
+Version 0.1.0 was tested on a 4,100-line project with 12 proven planted problems, built by an agent that never saw the skill's development runs, with two runs each, Claude Sonnet auditing and Claude Opus judging.
+
+| | With no skill | With audit-receipts |
+| --- | --- | --- |
+| Planted problems found | 18 of 24 | 22 of 24 |
+| Other real problems found | 4 | 38 |
+| False alarms or invented code | 0 | 0 |
+| Files opened | 83% | 100% |
+| Time and cost per audit | 1.2 min, $0.36 | 7.4 min, $4.72 |
+
+Both found all 6 problems at the release bar, so the skill's gain is in the rest, at more than 10 times the cost. It rated severity too high on 9 of 96 findings, against 2 of 34. The projects tested were small, at 2,700 to 6,000 lines. [Full results, limits and method](evals/audit-receipts/RESULTS.md).
 
 ## Install
 

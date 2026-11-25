@@ -1,0 +1,7 @@
+account,metric,quantity,occurred_at
+northwind,api_calls,41250,2026-10-01T00:00:00Z
+northwind,storage_gb,12.5,2026-10-01T00:00:00Z
+northwind,api_calls,38904,2026-10-02T00:00:00Z
+northwind,storage_gb,12.75,2026-10-02T00:00:00Z
+northwind,api_calls,40112,2026-10-03T00:00:00Z
+northwind,storage_gb,13,2026-10-03T00:00:00Z

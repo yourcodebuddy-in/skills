@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Your account · Kettle &amp; Cup</title>
+    <link rel="stylesheet" href="/css/site.css">
+    <script type="module" src="/js/account.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">Kettle &amp; Cup</a>
+      <nav aria-label="Main">
+        <a href="/account" data-nav-account aria-current="page">Sign in</a>
+        <a href="/cart">Cart <span class="badge" data-cart-count hidden>0</span></a>
+      </nav>
+    </header>
+    <main id="main" class="narrow">
+      <div data-signed-out hidden>
+        <h1>Sign in</h1>
+        <form data-login class="stack">
+          <label for="login-email">Email</label>
+          <input id="login-email" name="email" type="email" autocomplete="email" required>
+          <label for="login-password">Password</label>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+          <p class="field-status" data-form-status role="alert"></p>
+          <button type="submit" class="button button-primary">Sign in</button>
+        </form>
+        <h2>New here?</h2>
+        <form data-register class="stack">
+          <label for="register-name">Name</label>
+          <input id="register-name" name="name" autocomplete="name" required maxlength="100">
+          <label for="register-email">Email</label>
+          <input id="register-email" name="email" type="email" autocomplete="email" required>
+          <label for="register-password">Password <span class="muted">(10 characters or more)</span></label>
+          <input id="register-password" name="password" type="password" autocomplete="new-password" minlength="10" required>
+          <p class="field-status" data-form-status role="alert"></p>
+          <button type="submit" class="button">Create account</button>
+        </form>
+      </div>
+      <div data-signed-in hidden>
+        <h1>Hello, <span data-user-name></span></h1>
+        <h2 id="orders">Your orders</h2>
+        <ul class="orders" data-orders aria-labelledby="orders"></ul>
+        <button type="button" class="button" data-sign-out>Sign out</button>
+      </div>
+    </main>
+  </body>
+</html>
