@@ -1,0 +1,14 @@
+{
+  "db_path": "clinicbook.sqlite3",
+  "host": "127.0.0.1",
+  "port": 8080,
+  "session_hours": 12,
+  "worker_interval_seconds": 60,
+  "sms_url": null,
+  "sms_api_key": null,
+  "sms_sender": "ClinicBook",
+  "sms_timeout_seconds": 10,
+  "payments_url": null,
+  "payments_api_key": null,
+  "log_level": "INFO"
+}

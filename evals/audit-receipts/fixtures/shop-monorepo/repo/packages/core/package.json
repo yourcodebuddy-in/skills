@@ -1,0 +1,10 @@
+{
+  "name": "@kettle/core",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.js",
+  "scripts": {
+    "test": "node --test"
+  }
+}

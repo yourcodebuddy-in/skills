@@ -1,0 +1,9 @@
+{
+  "db_path": "/data/clinicbook.sqlite3",
+  "host": "0.0.0.0",
+  "port": 8080,
+  "sms_url": "https://sms.example.net",
+  "sms_sender": "HarborCare",
+  "payments_url": "https://payments.example.net",
+  "log_level": "INFO"
+}

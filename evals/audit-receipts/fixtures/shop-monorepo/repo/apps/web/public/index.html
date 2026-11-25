@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kettle &amp; Cup</title>
+    <link rel="stylesheet" href="/css/site.css">
+    <script type="module" src="/js/storefront.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the shop</a>
+    <header class="site-header">
+      <a class="brand" href="/">Kettle &amp; Cup</a>
+      <nav aria-label="Main">
+        <a href="/account" data-nav-account>Sign in</a>
+        <a href="/cart">Cart <span class="badge" data-cart-count hidden>0</span></a>
+      </nav>
+    </header>
+    <p class="banner">Free US shipping on orders of $50 or more.</p>
+    <main id="main">
+      <h1>Coffee gear and beans</h1>
+      <form class="filters" data-filters role="search">
+        <label for="q">Search</label>
+        <input id="q" name="q" type="search" autocomplete="off">
+        <label for="sort">Sort by</label>
+        <select id="sort" name="sort">
+          <option value="newest">Newest</option>
+          <option value="price_asc">Price, low to high</option>
+          <option value="price_desc">Price, high to low</option>
+          <option value="name">Name</option>
+        </select>
+        <button type="submit" class="button">Search</button>
+      </form>
+      <p class="status-line" data-status role="status" aria-live="polite"></p>
+      <section class="grid" data-products aria-label="Products"></section>
+      <nav class="pager" data-pager aria-label="Pages" hidden>
+        <button type="button" class="button" data-prev>Previous</button>
+        <span data-page-label></span>
+        <button type="button" class="button" data-next>Next</button>
+      </nav>
+    </main>
+    <footer class="site-footer">
+      <p>Orders ship from Portland, Oregon within two working days.</p>
+    </footer>
+  </body>
+</html>

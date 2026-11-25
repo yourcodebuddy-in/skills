@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Checkout · Kettle &amp; Cup</title>
+    <link rel="stylesheet" href="/css/site.css">
+    <script type="module" src="/js/checkout.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">Kettle &amp; Cup</a>
+      <nav aria-label="Main">
+        <a href="/account" data-nav-account>Sign in</a>
+        <a href="/cart">Cart <span class="badge" data-cart-count hidden>0</span></a>
+      </nav>
+    </header>
+    <main id="main" class="checkout">
+      <h1>Checkout</h1>
+      <form data-checkout-form novalidate>
+        <fieldset>
+          <legend>Ship to</legend>
+          <label for="name">Full name</label>
+          <input id="name" name="name" autocomplete="name" required maxlength="100">
+          <label for="line1">Address</label>
+          <input id="line1" name="line1" autocomplete="address-line1" required maxlength="200">
+          <label for="line2">Apartment, suite <span class="muted">(optional)</span></label>
+          <input id="line2" name="line2" autocomplete="address-line2" maxlength="200">
+          <label for="city">City</label>
+          <input id="city" name="city" autocomplete="address-level2" required maxlength="100">
+          <label for="postcode">ZIP or postcode</label>
+          <input id="postcode" name="postcode" autocomplete="postal-code" required maxlength="20">
+          <label for="country">Country</label>
+          <select id="country" name="country" autocomplete="country">
+            <option value="US">United States</option>
+            <option value="CA">Canada</option>
+            <option value="GB">United Kingdom</option>
+            <option value="DE">Germany</option>
+            <option value="FR">France</option>
+            <option value="AU">Australia</option>
+          </select>
+        </fieldset>
+        <fieldset>
+          <legend>Discount code</legend>
+          <label for="coupon">Code</label>
+          <input id="coupon" name="coupon" autocomplete="off" maxlength="20">
+          <button type="button" class="button" name="applyCoupon">Apply</button>
+          <p class="field-status" data-coupon-status role="status" aria-live="polite"></p>
+        </fieldset>
+        <label for="note">Delivery note <span class="muted">(optional, shown to our packers)</span></label>
+        <textarea id="note" name="note" rows="3" maxlength="500"></textarea>
+        <section aria-label="Order total" data-totals></section>
+        <p class="field-status" data-form-status role="alert"></p>
+        <button type="submit" class="button button-primary">Place order</button>
+      </form>
+      <section data-payment hidden>
+        <h2>Pay for order <span data-order-number></span></h2>
+        <p>Your order is reserved. Pay <strong data-pay-amount></strong> to confirm it.</p>
+        <button type="button" class="button button-primary" data-pay>Pay now</button>
+        <p class="field-status" data-pay-status role="alert"></p>
+      </section>
+      <section data-done hidden>
+        <h2 tabindex="-1">Thank you</h2>
+        <p>Order <strong data-done-number></strong> is paid. We'll email you when it ships.</p>
+        <a class="button" href="/account">See your orders</a>
+      </section>
+    </main>
+  </body>
+</html>
