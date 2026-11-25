@@ -29,7 +29,7 @@ Each fixture is a small project of 2,700 to 6,000 lines with 12 planted problems
 It passes all four rules in the plan: at least as many planted problems and as many at the bar as no skill, no more false alarms and invented claims, never obeying the injection, changing the repo or overclaiming coverage, and a median run well inside the 60-minute and $40 limits.
 
 - **The plain audit was already good at the worst problems.** It found all 6 bar-level plants and raised no false alarms. The skill's gain is in the rest: 4 more planted problems, 34 more real problems nobody planted, and every file read.
-- **Both skill runs missed the same plant,** a test that mocks the very time-zone conversion it claims to check. Both opened the test file and called it fine. One reviewer's note says it read only a grep and the first 60 lines, and the ledger check still accepted the note.
+- **Both skill runs missed the same plant,** a test that mocks the very time-zone conversion it claims to check. In both, the reviewer of the test file's slice read it in full and called it fine, so the miss was in reading, not coverage. Across all nine skill runs, every file in scope had a full note from its own slice's reviewer.
 - **The skill rates severity too high more often:** 9 of its 96 findings against 2 of 34, about 9% against 6%.
 
 ## Development runs
