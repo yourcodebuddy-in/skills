@@ -28,7 +28,7 @@ Then ask, for each piece of behavior:
 3. **Trust.** Where does outside input enter, and can it reach a query, command, path, template, redirect or deserializer? Who may do this, and is that enforced for this exact object and tenant?
 4. **Siblings.** Find the closest code doing the same kind of job. What does it do that this doesn't, such as a permission check, a lock, validation, cleanup or a retry key?
 5. **Claims.** Do names, comments, docs, and tests match what the code does?
-6. **Tests.** Would each test fail if the code it covers broke? Is the risky path tested at all?
+6. **Tests.** Would each test fail if the code it covers broke? Look at what it mocks, patches or stubs: a test that replaces the very function it's named for, or asserts only what its own stub returns, checks nothing. Is the risky path tested at all?
 7. **Design and upkeep.** Code that exists for no current need, a layer with one caller, a wrapper that only passes calls on, the same rule written in two places (name both), siblings that do the same job in different ways for no reason, a function doing several unrelated jobs, names that mislead.
 8. **Dead code.** An export, file, option, branch or dependency nothing uses. Search the whole repo before saying so, including tests, config, scripts, string references and dynamic loading.
 9. **Decisions.** If the code contradicts a recorded decision, or a decision's stated reason no longer holds, say so with evidence.

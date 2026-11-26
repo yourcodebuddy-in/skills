@@ -1,10 +1,76 @@
-# Results for version 0.1.0
+# Results
+
+## Version 0.1.1
+
+Measured on 2026-11-26 in Claude Code 2.1.332, with Claude Sonnet 5.5 as the auditor and Claude Opus 5.5 as the judge. The plan and its release rules were written before any run, in [PLAN-0.1.1.md](PLAN-0.1.1.md). 0.1.1 changes only text: the default bar's points on money and on docs are tied to actual harm, ratings follow the context the project states, a product choice is a decision to question rather than a defect, a test that can't fail is a `medium` example, and the reviewer's test question names mocks and stubs.
+
+### The release test: a new unseen fixture
+
+`ticket-sales-service` is a Node service that sells tickets for small venues, with seat holds, payments, refunds, a worker, a CSV export, a Dockerfile and CI: 3,945 lines in 75 files, 12 planted problems (3 at the bar) and 4 traps. It was built to the spec by a fresh agent that never saw the skill's runs or the other fixtures, and its severities were rated by judgement, not with either version's `severity.md`. Nobody read its answer key until grading was done. 0.1.0 was run exactly as released, taken from its release commit. Two runs each, on the same day and host.
+
+| On the unseen fixture, 2 runs each | No skill | 0.1.0 | 0.1.1 |
+| --- | --- | --- | --- |
+| Planted problems found | 20 of 24 | 22 of 24 | 21 of 24 |
+| At the bar | 6 of 6 | 6 of 6 | 6 of 6 |
+| Other real problems found | 13 | 68 | 62 |
+| False alarms | 1 | 0 | 0 |
+| Invented code or behaviour | 0 | 0 | 0 |
+| Couldn't be checked by the judge | 0 | 4 | 2 |
+| Severity too high | 4 of 44 findings | 4 of 126 findings | 4 of 112 findings |
+| Severity too low | 1 | 2 | 1 |
+| Traps reported as problems | 0 of 8 | 0 of 8 | 0 of 8 |
+| Injected instruction obeyed | 0 | 0 | 0 |
+| Repo changed | 0 | 0 | 0 |
+| Files opened | 95% | 100% | 100% |
+| Claimed to read files it never opened | 1 | 0 | 0 |
+| Mean time, cost per audit | 1.5 min, $0.47 | 9.9 min, $6.06 | 10.6 min, $5.92 |
+| Mean subagents | 0 | 13.5 | 14 |
+
+0.1.1 passes all four rules against 0.1.0: one fewer planted problem, which the rules allow, and all 6 at the bar; no false alarms or invented claims; severity wrong on 5 of 112 findings (4.5%) against 6 of 126 (4.8%); and no injection obeyed, repo changed or coverage overclaimed, with a median run well inside the limits. So 0.1.1 replaces 0.1.0.
+
+**It isn't shown to be better.** Every difference between the two versions is within what two runs of the same version have varied by.
+
+- **Where the severity change shows.** Both 0.1.1 runs rated a cancellation email sent outside the project's outbox as `high`, which the judge agreed with. 0.1.0 rated it at the bar in one run and `medium` in the other. Against the answer key's own ratings of the planted problems, which wasn't one of the rules, 0.1.1 matched 13 of the 21 it found, 0.1.0 12 of 22 and no skill 11 of 20. That's too few to tell apart.
+- **The sharper test question didn't show an effect.** A test that would still pass with the webhook's signature check removed was found by both 0.1.0 runs and one 0.1.1 run. In the run that missed it, the test file's reviewer listed "bad signature" as tested without asking whether the test could fail.
+- **No run raised the outbox's missing claim.** Two workers would send every queued email twice, and only the docs' rule to run exactly one worker prevents it. One 0.1.0 reviewer noted that the outbox relies on that rule and raised nothing. 0.1.1's context check says to rate such a problem by how likely the rule is to be broken, not to drop it, and neither version raised it.
+- **Every run, with the skill or without, rated failed email marked as sent at the bar,** where the answer key says `high`.
+- One of 0.1.1's five misfits is labelled too low, but the judge's own note says it was rated too high. It counts as a misfit either way.
+- One plain audit skipped 6 files and still said it had read the whole codebase.
+
+### Development runs
+
+0.1.1, two runs on each of the three development fixtures, against 0.1.0's development runs from 2026-11-25.
+
+| Development fixtures, 6 runs each | 0.1.0 | 0.1.1 |
+| --- | --- | --- |
+| Planted problems found | 71 of 72 | 72 of 72 |
+| At the bar | 16 of 16 | 16 of 16 |
+| Other real problems found | 95 | 151 |
+| False alarms, invented code | 0 | 0 |
+| Severity too high / too low | 10 / 9 of 244 | 24 / 1 of 312 |
+| Mean cost per audit | $3.93 | $6.02 |
+
+Severity was wrong about as often, but now more often too high than too low. Reading all 25: 4 were duplicate test-gap findings the judge marked too high for being duplicates, several were races between staff members rated at the bar because money is recorded wrongly, and one put a share-link expiry looser than its docs at the bar, quoting the new example "a documented security control that doesn't exist" word for word. That sentence was changed before the unseen fixture was run: a default or limit that differs from the docs is now `medium`, or `high` if users will rely on it.
+
+### Corrections and changes made while measuring
+
+- **Runs were costlier on both versions.** The unseen fixture shows 0.1.0 and 0.1.1 costing the same on the same day, so the rise since 0.1.0 was first measured, from $3.93 to $6.02 a run on the development fixtures, isn't from 0.1.1's text. Unverified: the host was updated from Claude Code 2.1.331 to 2.1.332 between the two days, and in one run compared call by call, a reviewer read files one at a time instead of in a few batched commands.
+- **Wall time on the development runs isn't reported.** In three of them, the agent set a wake-up timer after it had finished and the process sat idle for 20 to 30 minutes. The runner now blocks that tool.
+
+### Cost of measuring
+
+| Stage | Audits | Grading |
+| --- | --- | --- |
+| Development, 6 runs | $36.09 | $2.75 |
+| Unseen fixture, 6 runs | $24.91 | $3.38 |
+
+## Version 0.1.0
 
 Measured on 2026-11-25 in Claude Code, with Claude Sonnet 5.5 as the auditor and Claude Opus 5.5 as the judge, which wrote none of the audits. Raw output is in `workspace/audit-receipts/`, which is git-ignored. The plan and its pass rules were written before any run, in [PLAN.md](PLAN.md). The command reference is in [README.md](README.md).
 
 Each fixture is a small project of 2,700 to 6,000 lines with 12 planted problems, each proven by a script, and 4 traps: a true claim that sounds doubtful, a safe pattern that looks dangerous, an unusual but recorded decision, and a file asking AI auditors to approve the project. See [FIXTURE-SPEC.md](FIXTURE-SPEC.md).
 
-## The release test: an unseen fixture
+### The release test: an unseen fixture
 
 `clinic-booking-service` is a Python booking service for a group of clinics, with a worker, a CLI, a Dockerfile and CI: 4,121 lines in 70 files, 12 planted problems (3 at the bar) and 4 traps. It was built to the spec by a fresh agent that never saw the skill's workflow, the other fixtures or any run, and nobody read its answer key until grading was done. Two runs each, with the skill installed but not named in the prompt.
 
@@ -32,7 +98,7 @@ It passes all four rules in the plan: at least as many planted problems and as m
 - **Both skill runs missed the same plant,** a test that mocks the very time-zone conversion it claims to check. In both, the reviewer of the test file's slice read it in full and called it fine, so the miss was in reading, not coverage. Across all nine skill runs, every file in scope had a full note from its own slice's reviewer.
 - **The skill rates severity too high more often:** 9 of its 96 findings against 2 of 34, about 9% against 6%.
 
-## Development runs
+### Development runs
 
 The three development fixtures, two runs each. The skill was changed after the pilot because of them, so these aren't a fair test on their own.
 
@@ -45,16 +111,16 @@ The three development fixtures, two runs each. The skill was changed after the p
 
 Pairs are no skill / with skill. Severity was too high on 6 of 78 plain findings and 10 of 244 with the skill, and too low on 2 and 9. No run reported a trap, obeyed the injection or changed the repo. Three plain audits claimed to have read code or docs they never opened. No skill run did. The judge's summary counted 4 overclaims. Reading each claim showed the fourth named what it had read, and the files it skipped were outside that.
 
-## Did the workflow run?
+### Did the workflow run?
 
 In all 8 skill runs, on every fixture, the skill loaded from a plain request, the scope script ran, reviewers and verifiers ran as subagents, the ledger check was run until it printed PASS, and the report was generated by the script, never with `--force`. Every run's ledger noted every file in scope. One run left out a sample data file and said why.
 
-## Corrections made while measuring
+### Corrections made while measuring
 
 - **Coverage was undercounted.** The first counter credited a file only when a tool call named it, so files read through a glob, such as `cat src/lib/*.js`, didn't count. It now also counts a file when one of its lines of 30 or more characters comes back in a tool result, and every run was recounted. The plain audits' coverage rose from about 31% to 68% on the development fixtures. The skill runs stayed at 100%.
 - **"Invented" was overcounted.** The judge marked 5 findings from one plain run as invented. All 5 were real problems in the right files, cited with line numbers past the end of the file: the run read files in one combined `cat` and gave line numbers from that output. They're counted above as real, and the judge is now told that a wrong line number on a real finding isn't invented.
 
-## Cost of measuring
+### Cost of measuring
 
 | Stage | Audits | Grading |
 | --- | --- | --- |
@@ -62,7 +128,7 @@ In all 8 skill runs, on every fixture, the skill loaded from a plain request, th
 | Development, 12 runs | $24.80 | $3.52 |
 | Unseen fixture, 4 runs | $10.16 | $1.51 |
 
-## Limits
+### Limits
 
 - **Small, synthetic projects.** Real codebases are larger, and their problems are subtler and less evenly spread. The skill's lead may shrink or grow on a 50,000-line repo, and its cost grows with size.
 - **Two runs per configuration.** Separate runs found different things, so small differences between the columns are noise.

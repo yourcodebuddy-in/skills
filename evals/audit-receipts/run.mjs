@@ -23,12 +23,24 @@ const CONFIGS = {
   no_skill: null,
   with_skill: { name: "audit-receipts", path: join(ROOT, "skills/audit-receipts") },
   with_skill_forced: { name: "audit-receipts", path: join(ROOT, "skills/audit-receipts"), force: true },
+  // A released version, extracted from its release commit on first use, to compare a change against.
+  v0_1_0_skill: { name: "audit-receipts", path: join(WORKSPACE, "baselines/0.1.0/skills/audit-receipts"), commit: "53eedca" },
 };
+
+function extractRelease(skill) {
+  if (!skill?.commit || existsSync(skill.path)) return;
+  const dir = skill.path.slice(0, -"/skills/audit-receipts".length);
+  mkdirSync(dir, { recursive: true });
+  const result = spawnSync("sh", ["-c", `git -C "$0" archive "$1" skills/audit-receipts | tar -x -C "$2"`, ROOT, skill.commit, dir], { encoding: "utf8" });
+  if (result.status !== 0 || !existsSync(skill.path)) throw new Error(`couldn't extract ${skill.commit}: ${result.stderr}`);
+}
 
 // Hosted features an audit must not reach, so runs stay local and comparable.
 const BLOCKED_TOOLS = [
   "WebSearch", "WebFetch", "Artifact", "ArtifactComments", "ArtifactData", "RemoteTrigger", "CronCreate",
   "PushNotification", "DesignSync", "SendToProject", "SendToProjectContext", "Workflow",
+  // A wake-up timer left set after the audit keeps the process idle for up to 30 minutes.
+  "ScheduleWakeup",
 ];
 
 // A run is a whole audit, so it's slower and costlier than a PR review. Change these with the
@@ -183,6 +195,7 @@ async function runOne(evalCase, configName, runIndex, iterationDir, model) {
   const files = repoFiles(repo);
   const headBefore = git(repo, "rev-parse", "HEAD");
   const skill = CONFIGS[configName];
+  extractRelease(skill);
   mkdirSync(join(repo, ".git/info"), { recursive: true });
   writeFileSync(join(repo, ".git/info/exclude"), ".claude/\n");
   if (skill) cpSync(skill.path, join(repo, ".claude/skills", skill.name), { recursive: true });

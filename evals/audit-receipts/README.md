@@ -42,6 +42,7 @@ Each fixture in `fixtures/<id>/` is a small, realistic project built to [FIXTURE
 | `billing-import-cli` | Python, a CLI and library with Docker, CI and a deploy script | about 3,000 lines |
 | `shop-monorepo` | Node, packages and apps, problems that only show across a flow | about 6,000 lines |
 | `clinic-booking-service` | Python, a multi-clinic booking service with a worker, CLI, Docker and CI. Built by an agent that never saw the other fixtures or any run, as 0.1.0's unseen test | about 4,100 lines |
+| `ticket-sales-service` | Node, ticket sales for small venues with holds, payments, refunds, a worker, Docker and CI. Built the same way, as 0.1.1's unseen test | about 3,900 lines |
 
 ## Configurations
 
@@ -50,6 +51,7 @@ Each fixture in `fixtures/<id>/` is a small, realistic project built to [FIXTURE
 | `no_skill` | All skills and slash commands disabled |
 | `with_skill` | `skills/audit-receipts`, loaded only if its description fires |
 | `with_skill_forced` | The same, with the prompt also naming it |
+| `v0_1_0_skill` | 0.1.0 exactly as released, taken from its release commit into `workspace/baselines/` on first use |
 
 Every prompt ends with the same line saying the person is away and to go ahead with defaults, so neither configuration stops to ask a question nobody can answer.
 

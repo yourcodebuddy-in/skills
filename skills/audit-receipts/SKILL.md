@@ -3,7 +3,7 @@ name: audit-receipts
 description: Audits a whole codebase or a large part of it, reading every file, and checks each finding against the code before reporting it. Covers bugs, security, design, dead and duplicated code, tests, docs that don't match the code, dependencies, and decisions already made, then scores each area. Use when someone asks to audit, review, assess, rate, or health-check a repo, a package, or a service as a whole, wants to know how well it's written or whether it's ready to build on, or asks for a full or deep code review that isn't about one change.
 license: MIT
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
 ---
 
 # Audit receipts
@@ -47,7 +47,7 @@ It lists every tracked text file with its line count, groups them into slices a 
 Then tell the user, in a few lines, and wait for one go-ahead:
 
 - what will be audited: files, lines, slices, and what was excluded
-- the mode (below), how many agents it starts, and that a whole-repo audit is expensive. As a guide, in testing a Standard audit of a 3,000 to 6,000-line repo started 11 to 20 subagents and took 5 to 9 minutes, at about 10 to 20 times the cost of asking for an audit plainly. Cost grows with the number of lines
+- the mode (below), how many agents it starts, and that a whole-repo audit is expensive. As a guide, in testing a Standard audit of a 3,000 to 6,000-line repo started 11 to 20 subagents and took 5 to 12 minutes, at about 10 to 20 times the cost of asking for an audit plainly. Cost grows with the number of lines
 - the verifier: a fresh agent on the same model by default. If the host can run a model from a different family, such as another provider in the same tool or another vendor's CLI, offer it and say that this sends the code to that vendor. Use it only if the user says yes. If the user named a model, use that one
 - whether you may start services or run the test suite in a throwaway copy, where the project needs them
 

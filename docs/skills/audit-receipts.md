@@ -51,21 +51,21 @@ Three modes: Quick (one reviewer per part), Standard (adds the flows, and is the
 
 ## Results
 
-Version 0.1.0 was measured on four small projects with 12 proven planted problems each, with Claude Sonnet as the auditor and Claude Opus as the judge. The release test was a fixture built by an agent that never saw the skill's development runs, with two runs each:
+Each version is tested on a small project with 12 proven planted problems, built by an agent that never saw the skill's development runs, with Claude Sonnet auditing and Claude Opus judging. Version 0.1.1 was tested against 0.1.0 and no skill on a 3,945-line Node service, with two runs each:
 
-| On the unseen fixture | No skill | With audit-receipts |
-| --- | --- | --- |
-| Planted problems found | 18 of 24 | 22 of 24 |
-| At the bar | 6 of 6 | 6 of 6 |
-| Other real problems found | 4 | 38 |
-| False alarms or invented code | 0 | 0 |
-| Files opened | 83% | 100% |
-| Severity too high | 2 of 34 | 9 of 96 |
-| Time and cost per audit | 1.2 min, $0.36 | 7.4 min, $4.72 |
+| On the unseen fixture | No skill | 0.1.0 | 0.1.1 |
+| --- | --- | --- | --- |
+| Planted problems found | 20 of 24 | 22 of 24 | 21 of 24 |
+| At the bar | 6 of 6 | 6 of 6 | 6 of 6 |
+| Other real problems found | 13 | 68 | 62 |
+| False alarms or invented code | 1 | 0 | 0 |
+| Files opened | 95% | 100% | 100% |
+| Severity wrong | 5 of 44 | 6 of 126 | 5 of 112 |
+| Time and cost per audit | 1.5 min, $0.47 | 9.9 min, $6.06 | 10.6 min, $5.92 |
 
-On the three development fixtures it found 71 of 72 planted problems against 37, and all 16 at the bar against 9, with no false alarms. Three plain audits there claimed to have read files they never opened. No skill run did.
+0.1.1 passed the release rules written before the run, but every difference from 0.1.0 is within what two runs of the same version vary by. 0.1.0's own release test, on a 4,100-line Python service, found 22 of 24 planted problems against 18 with no skill. On the three development fixtures, the skill found 71 or 72 of 72 planted problems against 37, and all 16 at the bar against 9.
 
-**What to expect:** a plain request already finds most of the worst problems on a small project. The skill finds more of everything else, reads every file, and reports nothing it hasn't checked. It costs 10 to 20 times as much, rates severity too high a little more often, and still missed one planted test that mocks what it claims to test. The projects were 2,700 to 6,000 lines. Expect more time and cost on a real codebase, and results that may differ. See [evals/audit-receipts/RESULTS.md](../../evals/audit-receipts/RESULTS.md) for the full tables, the corrections made while measuring, and the limits.
+**What to expect:** a plain request already finds most of the worst problems on a small project. The skill finds more of everything else, reads every file, and reports nothing it hasn't checked. One plain audit said it had read the whole codebase after skipping 6 files; no skill run has. It costs 10 to 20 times as much, and still sometimes misses a test that can't fail. The projects were 2,700 to 6,000 lines. Expect more time and cost on a real codebase, and results that may differ. See [evals/audit-receipts/RESULTS.md](../../evals/audit-receipts/RESULTS.md) for the full tables, the corrections made while measuring, and the limits.
 
 ## How it was measured
 
