@@ -1,0 +1,16 @@
+[Unit]
+Description=Box Office worker (holds, jobs, mail)
+After=network.target
+
+[Service]
+User=boxoffice
+WorkingDirectory=/srv/boxoffice/current
+EnvironmentFile=/srv/boxoffice/shared/.env
+ExecStart=/usr/bin/node src/worker/index.js
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=60
+
+[Install]
+WantedBy=multi-user.target

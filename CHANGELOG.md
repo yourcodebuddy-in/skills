@@ -2,6 +2,15 @@
 
 Each skill has its own version, set in its `SKILL.md`.
 
+## audit-receipts 0.1.1
+
+- The default bar's points on money and docs are tied to actual harm. A wrong figure that's only displayed, while the right one is charged or stored, is `high` at most. A default or limit that differs from the docs is `medium`, or `high` if users will rely on it.
+- Ratings follow the context the project states, such as a part documented as a stand-in for development or a rule to run one worker.
+- A product choice the project made is a decision to question with evidence, not a defect.
+- A test that would still pass with its code broken is a `medium` example, and the reviewer's question on tests names mocks and stubs.
+
+On a new unseen fixture it passed the release rules set before the run, against 0.1.0, but every difference was within what two runs of one version vary by. See [the results](evals/audit-receipts/RESULTS.md).
+
 ## audit-receipts 0.1.0
 
 First release. See [its page](docs/skills/audit-receipts.md) for how it works and how it scored, and [the results](evals/audit-receipts/RESULTS.md) for what it wasn't tested on.

@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Tests
+        run: node --test
+
+      - name: Migrations apply to an empty database
+        run: node bin/boxoffice.js migrate
+        env:
+          DATABASE_PATH: ${{ runner.temp }}/ci.db
+
+      - name: Server starts and answers its health check
+        env:
+          DATABASE_PATH: ${{ runner.temp }}/ci.db
+          PORT: 3999
+        run: |
+          node src/server.js &
+          for i in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:3999/healthz; then exit 0; fi
+            sleep 0.5
+          done
+          echo "server did not start" >&2
+          exit 1
+
+  image:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image
+        run: docker build -t boxoffice:${{ github.sha }} .

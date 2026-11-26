@@ -1,0 +1,14 @@
+[Unit]
+Description=Box Office web server
+After=network.target
+
+[Service]
+User=boxoffice
+WorkingDirectory=/srv/boxoffice/current
+EnvironmentFile=/srv/boxoffice/shared/.env
+ExecStart=/usr/bin/node src/server.js
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

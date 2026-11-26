@@ -28,17 +28,17 @@ Of the 8 published tools we scored with the same judge, the top one scored 61.9,
 
 ### How audit-receipts was tested
 
-Version 0.1.0 was tested on a 4,100-line project with 12 proven planted problems, built by an agent that never saw the skill's development runs, with two runs each, Claude Sonnet auditing and Claude Opus judging.
+Each version is tested on a project with 12 proven planted problems, built by an agent that never saw the skill's development runs, with Claude Sonnet auditing and Claude Opus judging. Version 0.1.1 was tested on a 3,945-line Node service, with two runs each:
 
-| | With no skill | With audit-receipts |
-| --- | --- | --- |
-| Planted problems found | 18 of 24 | 22 of 24 |
-| Other real problems found | 4 | 38 |
-| False alarms or invented code | 0 | 0 |
-| Files opened | 83% | 100% |
-| Time and cost per audit | 1.2 min, $0.36 | 7.4 min, $4.72 |
+| | With no skill | 0.1.0 | 0.1.1 |
+| --- | --- | --- | --- |
+| Planted problems found | 20 of 24 | 22 of 24 | 21 of 24 |
+| Other real problems found | 13 | 68 | 62 |
+| False alarms or invented code | 1 | 0 | 0 |
+| Files opened | 95% | 100% | 100% |
+| Time and cost per audit | 1.5 min, $0.47 | 9.9 min, $6.06 | 10.6 min, $5.92 |
 
-Both found all 6 problems at the release bar, so the skill's gain is in the rest, at more than 10 times the cost. It rated severity too high on 9 of 96 findings, against 2 of 34. The projects tested were small, at 2,700 to 6,000 lines. [Full results, limits and method](evals/audit-receipts/RESULTS.md).
+All three found all 6 problems at the release bar, so the skill's gain is in the rest, at more than 10 times the cost. 0.1.1 passed the rules set before the run to replace 0.1.0, but isn't shown to be better. The projects tested were small, at 2,700 to 6,000 lines. [Full results, limits and method](evals/audit-receipts/RESULTS.md).
 
 ## Install
 
